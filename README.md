@@ -1,2 +1,652 @@
-# BellesBees
-Honey Bees 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Belle's Honey">
+<title>Belle's Honey — Hive Inspections</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --amber:#BA7517;--amber-l:#FAEEDA;--amber-d:#633806;
+  --green:#3B6D11;--green-l:#C0DD97;
+  --red:#A32D2D;--red-l:#F7C1C1;
+  --blue:#185FA5;--blue-l:#B5D4F4;
+  --bg:#FFFDF7;--surf:#FFFFFF;--surf2:#F5F3EE;
+  --border:#D3D1C7;--border2:#B4B2A9;
+  --text:#2C2C2A;--text2:#5F5E5A;--muted:#888780;
+  --pill-bg:#FFFFFF;--pill-text:#2C2C2A;
+  --btn-bg:#FFFFFF;--btn-text:#2C2C2A;
+  --score-bg:#F5F3EE;--input-bg:#FFFFFF;--mbox-bg:#F1EFE8;
+  --tag-g-bg:#EAF3DE;--tag-g-txt:#3B6D11;
+  --tag-y-bg:#FAEEDA;--tag-y-txt:#633806;
+  --tag-r-bg:#FCEBEB;--tag-r-txt:#A32D2D;
+  --tag-b-bg:#E6F1FB;--tag-b-txt:#185FA5;
+  --tag-x-bg:#F1EFE8;--tag-x-txt:#5F5E5A;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --amber:#FAC775;--amber-l:#2d2010;--amber-d:#FAC775;
+    --green:#C0DD97;--green-l:#162008;
+    --red:#F09595;--red-l:#2a1010;
+    --blue:#85B7EB;--blue-l:#042C53;
+    --bg:#1A1917;--surf:#252320;--surf2:#2E2C28;
+    --border:#3a3835;--border2:#4a4845;
+    --text:#F0EDE4;--text2:#B4B2A9;--muted:#6a6865;
+    --pill-bg:#2E2C28;--pill-text:#F0EDE4;
+    --btn-bg:#2E2C28;--btn-text:#F0EDE4;
+    --score-bg:#2E2C28;--input-bg:#252320;--mbox-bg:#2E2C28;
+    --tag-g-bg:#162008;--tag-g-txt:#C0DD97;
+    --tag-y-bg:#2d2010;--tag-y-txt:#FAC775;
+    --tag-r-bg:#2a1010;--tag-r-txt:#F09595;
+    --tag-b-bg:#042C53;--tag-b-txt:#85B7EB;
+    --tag-x-bg:#2E2C28;--tag-x-txt:#B4B2A9;
+  }
+}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
+#app{max-width:480px;margin:0 auto;padding-bottom:80px}
+.hdr{background:var(--surf);border-bottom:1px solid var(--border);padding:13px 16px;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;color:var(--amber);letter-spacing:.03em}
+.hdr-sub{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+.tabs{display:flex;background:var(--surf);border-bottom:1px solid var(--border)}
+.tab{flex:1;padding:11px 8px;text-align:center;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent}
+.tab.on{color:var(--amber);border-bottom-color:var(--amber)}
+.scr{display:none;padding:16px}.scr.on{display:block}
+.slbl{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:0 0 8px}
+.card{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.card-t{font-weight:500;font-size:14px;margin-bottom:14px;color:var(--text)}
+.hcard{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:10px}
+.hcard.sel{border-color:var(--amber);background:var(--amber-l)}
+.hcard-name{font-weight:500;font-size:15px;color:var(--text)}
+.hcard-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-left:12px}
+.dot-g{background:#639922}.dot-y{background:#EF9F27}.dot-r{background:#E24B4A}.dot-x{background:var(--border2)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.stat{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center}
+.stat-n{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:500;color:var(--amber)}
+.stat-l{font-size:11px;color:var(--muted);margin-top:2px}
+.btn{display:flex;align-items:center;justify-content:center;padding:11px 18px;border-radius:10px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--btn-bg);color:var(--btn-text);width:100%;margin-bottom:8px}
+.btn-p{background:var(--amber);border-color:var(--amber);color:#1A1510}
+.btn-d{border-color:var(--red);color:var(--red);background:transparent}
+.btn-s{background:var(--green);border-color:var(--green);color:#0A1A03}
+.btn-sm{padding:7px 14px;font-size:13px;width:auto;margin-bottom:0}
+.btn-row{display:flex;gap:8px;margin-top:20px}
+.btn-row .btn{margin-bottom:0;flex:1}
+.fg{margin-bottom:16px}.fg:last-child{margin-bottom:0}
+label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:6px}
+input[type=text],input[type=date],input[type=number],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:15px;color:var(--text);background:var(--input-bg);-webkit-appearance:none;appearance:none;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--amber)}
+textarea{resize:vertical;min-height:76px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888780' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.pills{display:flex;gap:7px;flex-wrap:wrap}
+.pill{padding:7px 13px;border:1px solid var(--border2);border-radius:20px;font-size:13px;cursor:pointer;background:var(--pill-bg);color:var(--pill-text);user-select:none;font-family:inherit}
+.pill.on{background:var(--amber);border-color:var(--amber);color:#1A1510}
+.pill-sm{padding:6px 10px;font-size:12px}
+.srow{display:flex;gap:6px}
+.sbtn{flex:1;padding:10px 4px;border:1px solid var(--border2);border-radius:10px;font-size:13px;font-weight:500;text-align:center;cursor:pointer;background:var(--score-bg);color:var(--text);user-select:none;font-family:inherit}
+.sbtn.sg{background:var(--tag-g-bg);border-color:var(--green);color:var(--green)}
+.sbtn.sy{background:var(--tag-y-bg);border-color:var(--amber);color:var(--amber-d)}
+.sbtn.sr{background:var(--tag-r-bg);border-color:var(--red);color:var(--red)}
+.trow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.trow:last-child{border-bottom:none}
+.trow-lbl{font-size:15px;color:var(--text)}
+.tog{position:relative;width:44px;height:26px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tog-tr{position:absolute;inset:0;background:var(--border2);border-radius:13px;cursor:pointer;transition:background .2s}
+.tog input:checked+.tog-tr{background:var(--amber)}
+.tog-tr::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}
+.tog input:checked+.tog-tr::after{transform:translateX(18px)}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:11px;padding:3px 8px;border-radius:10px;font-family:'IBM Plex Mono',monospace}
+.tag-g{background:var(--tag-g-bg);color:var(--tag-g-txt)}
+.tag-y{background:var(--tag-y-bg);color:var(--tag-y-txt)}
+.tag-r{background:var(--tag-r-bg);color:var(--tag-r-txt)}
+.tag-b{background:var(--tag-b-bg);color:var(--tag-b-txt)}
+.tag-x{background:var(--tag-x-bg);color:var(--tag-x-txt)}
+.iitem{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+.iitem-hdr{display:flex;justify-content:space-between;align-items:flex-start}
+.iitem-hive{font-weight:500;font-size:14px;color:var(--text)}
+.iitem-date{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.iitem-note{font-size:13px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mbox{display:none;margin-top:4px;margin-bottom:12px;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--mbox-bg)}
+.mbox-rate{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:500;color:var(--text)}
+.mbox-unit{font-size:13px;color:var(--muted);margin-left:4px}
+.mbox-lbl{display:inline-block;font-size:12px;font-weight:500;padding:3px 9px;border-radius:8px;margin-left:8px;font-family:'IBM Plex Mono',monospace}
+.mbox-note{font-size:12px;color:var(--muted);margin-top:5px}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;overflow-y:auto;padding:20px 12px;align-items:flex-start;justify-content:center}
+.overlay.on{display:flex}
+.modal{background:var(--bg);border-radius:14px;width:100%;max-width:460px;padding:20px 16px 28px;border:1px solid var(--border)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-t{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;color:var(--amber)}
+.modal-x{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;padding:4px}
+.dtbl{width:100%;border-collapse:collapse;font-size:14px}
+.dtbl td{padding:6px 0;vertical-align:top;color:var(--text)}
+.dtbl .k{color:var(--muted);font-size:13px;width:44%}
+.dtbl .v{font-weight:500}
+.sub{display:none;margin-top:10px;padding-top:12px;border-top:1px solid var(--border)}
+.sub.on{display:block}
+.fab{position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--amber);color:#1A1510;font-size:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3);font-weight:300;line-height:1}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-i{font-size:36px;margin-bottom:10px}
+hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
+
+/* ── Photo styles ── */
+.photo-upload-area{border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:10px;background:var(--surf2)}
+.photo-upload-area:active{border-color:var(--amber)}
+.photo-upload-icon{font-size:28px;margin-bottom:6px}
+.photo-upload-txt{font-size:13px;color:var(--muted)}
+.photo-upload-txt strong{color:var(--amber);font-weight:500}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.photo-thumb-wrap{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--surf2)}
+.photo-thumb{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
+.photo-thumb-del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.photo-thumb-lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:3px 5px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.photo-count-tag{font-size:11px;padding:3px 8px;border-radius:10px;font-family:'IBM Plex Mono',monospace;background:var(--blue-l);color:var(--blue-l);background:var(--tag-b-bg);color:var(--tag-b-txt);display:inline-block}
+
+/* Photo lightbox */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;flex-direction:column}
+.lightbox.on{display:flex}
+.lightbox-img{max-width:95vw;max-height:80vh;object-fit:contain;border-radius:8px}
+.lightbox-cap{color:#fff;font-size:13px;margin-top:12px;opacity:.75;font-family:'IBM Plex Mono',monospace}
+.lightbox-close{position:absolute;top:16px;right:20px;background:none;border:none;color:#fff;font-size:30px;cursor:pointer;opacity:.8;line-height:1}
+.lightbox-nav{display:flex;gap:16px;margin-top:14px}
+.lightbox-nav button{background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 20px;border-radius:20px;font-size:14px;cursor:pointer}
+
+/* Photo grid in detail modal */
+.detail-photo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.detail-photo-wrap{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;cursor:pointer}
+.detail-photo{width:100%;height:100%;object-fit:cover}
+.detail-photo-lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:4px 6px;font-family:'IBM Plex Mono',monospace}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div><div class="hdr-title">Belle's Honey</div><div class="hdr-sub">hive inspection log</div></div>
+    <button class="btn btn-sm" style="width:auto;margin-bottom:0" onclick="UI.showExport()">Export CSV</button>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="UI.tab('hives',this)">Hives</button>
+    <button class="tab" onclick="UI.tab('log',this)">Log</button>
+    <button class="tab" onclick="UI.tab('history',this)">History</button>
+  </div>
+
+  <div id="scr-hives" class="scr on">
+    <div class="stats" id="stats"></div>
+    <div class="slbl">Your hives</div>
+    <div id="hive-list"></div>
+    <button class="btn" onclick="UI.openAddHive()">+ Add hive</button>
+  </div>
+
+  <div id="scr-log" class="scr">
+    <div class="slbl">Select hive to inspect</div>
+    <div id="log-hives"></div>
+    <div id="log-form"></div>
+  </div>
+
+  <div id="scr-history" class="scr">
+    <div class="fg"><select id="hist-filter" onchange="UI.renderHistory()"><option value="">All hives</option></select></div>
+    <div id="hist-list"></div>
+  </div>
+</div>
+
+<button class="fab" onclick="UI.tab('log',document.querySelectorAll('.tab')[1])">+</button>
+
+<!-- ADD HIVE -->
+<div class="overlay" id="m-add">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-t">Add hive</span><button class="modal-x" onclick="UI.closeModal('m-add')">×</button></div>
+    <div class="fg"><label>Hive name / number</label><input type="text" id="new-name" placeholder="e.g. Hive 3, South Yard #1"></div>
+    <div class="fg"><label>Location / notes</label><input type="text" id="new-loc" placeholder="e.g. Back orchard, Langstroth 10-frame"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="UI.closeModal('m-add')">Cancel</button>
+      <button class="btn btn-p" onclick="UI.saveHive()">Add hive</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL -->
+<div class="overlay" id="m-detail">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-t" id="m-detail-t">Detail</span><button class="modal-x" onclick="UI.closeModal('m-detail')">×</button></div>
+    <div id="m-detail-body"></div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-d btn-sm" id="m-detail-del" onclick="UI.deleteItem()">Delete</button>
+      <button class="btn btn-sm" onclick="UI.closeModal('m-detail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT -->
+<div class="overlay" id="m-export">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-t">Export CSV</span><button class="modal-x" onclick="UI.closeModal('m-export')">×</button></div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:14px">Download all inspections for Excel or Google Sheets.</p>
+    <div class="fg"><label>Filter by hive</label><select id="exp-filter"><option value="">All hives</option></select></div>
+    <div class="btn-row">
+      <button class="btn" onclick="UI.closeModal('m-export')">Cancel</button>
+      <button class="btn btn-s" onclick="UI.doExport()">Download CSV</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="Photos.closeLightbox()">
+  <button class="lightbox-close" onclick="Photos.closeLightbox()">×</button>
+  <img class="lightbox-img" id="lb-img" src="" alt="">
+  <div class="lightbox-cap" id="lb-cap"></div>
+  <div class="lightbox-nav" onclick="event.stopPropagation()">
+    <button onclick="Photos.lbNav(-1)">← Prev</button>
+    <button onclick="Photos.lbNav(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+// ── Storage ───────────────────────────────────────────────────────────────────
+const DB={
+  hives(){try{return JSON.parse(localStorage.getItem('bh_hives'))||[];}catch{return[];}},
+  insps(){try{return JSON.parse(localStorage.getItem('bh_insps'))||[];}catch{return[];}},
+  setHives(v){localStorage.setItem('bh_hives',JSON.stringify(v));},
+  setInsps(v){localStorage.setItem('bh_insps',JSON.stringify(v));},
+};
+
+// ── Photo storage — kept separate to avoid hitting localStorage size limits ──
+// Photos stored as: bh_photos_{inspId} = [{id, label, dataUrl}]
+const PhotoDB={
+  get(inspId){try{return JSON.parse(localStorage.getItem('bh_photos_'+inspId))||[];}catch{return[];}},
+  set(inspId,arr){
+    try{localStorage.setItem('bh_photos_'+inspId,JSON.stringify(arr));}
+    catch(e){
+      if(e.name==='QuotaExceededError'){
+        alert('Storage full — photo not saved. Try taking fewer or smaller photos.');
+      }
+    }
+  },
+  del(inspId){localStorage.removeItem('bh_photos_'+inspId);},
+  count(inspId){return this.get(inspId).length;},
+};
+
+// ── Photo labels ──────────────────────────────────────────────────────────────
+const PHOTO_LABELS = ['Queen','Brood pattern','Queen cells','Varroa wash','Honey stores','Equipment','Other'];
+
+// ── In-memory staging for current inspection form ─────────────────────────────
+let stagedPhotos = []; // [{id, label, dataUrl}]
+
+// ── Photo module ──────────────────────────────────────────────────────────────
+const Photos = {
+  lbPhotos: [],
+  lbIdx: 0,
+
+  // Compress image to reasonable size for localStorage
+  compress(file, cb) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1000;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  },
+
+  // Called when user picks files in the form
+  handleFiles(files) {
+    Array.from(files).forEach(file => {
+      if (!file.type.startsWith('image/')) return;
+      this.compress(file, dataUrl => {
+        const photo = { id: '_p' + Date.now() + Math.random().toString(36).slice(2,5), label: 'Other', dataUrl };
+        stagedPhotos.push(photo);
+        this.renderStagedGrid();
+      });
+    });
+  },
+
+  // Render the photo grid inside the inspection form
+  renderStagedGrid() {
+    const grid = document.getElementById('staged-photo-grid');
+    if (!grid) return;
+    if (!stagedPhotos.length) {
+      grid.innerHTML = '';
+      return;
+    }
+    grid.innerHTML = stagedPhotos.map((p, i) => `
+      <div class="photo-thumb-wrap">
+        <img class="photo-thumb" src="${p.dataUrl}" onclick="Photos.openLightboxFromStaged(${i})">
+        <button class="photo-thumb-del" onclick="Photos.deleteStagedPhoto('${p.id}')">×</button>
+        <div class="photo-thumb-lbl">${p.label}</div>
+      </div>
+    `).join('');
+    // Update label selects below
+    this.renderLabelSelects();
+  },
+
+  // Render label selectors under the grid
+  renderLabelSelects() {
+    const wrap = document.getElementById('staged-label-wrap');
+    if (!wrap || !stagedPhotos.length) { if (wrap) wrap.innerHTML = ''; return; }
+    wrap.innerHTML = stagedPhotos.map((p, i) => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <img src="${p.dataUrl}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0">
+        <select onchange="Photos.setLabel('${p.id}',this.value)" style="flex:1;font-size:13px;padding:7px 10px">
+          ${PHOTO_LABELS.map(l => `<option value="${l}" ${l===p.label?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+    `).join('');
+  },
+
+  setLabel(id, label) {
+    const p = stagedPhotos.find(x => x.id === id);
+    if (p) { p.label = label; this.renderStagedGrid(); }
+  },
+
+  deleteStagedPhoto(id) {
+    stagedPhotos = stagedPhotos.filter(p => p.id !== id);
+    this.renderStagedGrid();
+    this.renderLabelSelects();
+  },
+
+  // Save staged photos to storage under an inspId
+  saveForInsp(inspId) {
+    if (stagedPhotos.length) PhotoDB.set(inspId, stagedPhotos);
+    stagedPhotos = [];
+  },
+
+  // Lightbox from staged grid
+  openLightboxFromStaged(idx) {
+    this.lbPhotos = stagedPhotos;
+    this.lbIdx = idx;
+    this.showLightbox();
+  },
+
+  // Lightbox from detail view
+  openLightbox(photos, idx) {
+    this.lbPhotos = photos;
+    this.lbIdx = idx;
+    this.showLightbox();
+  },
+
+  showLightbox() {
+    const p = this.lbPhotos[this.lbIdx];
+    if (!p) return;
+    document.getElementById('lb-img').src = p.dataUrl;
+    document.getElementById('lb-cap').textContent = p.label + (this.lbPhotos.length > 1 ? ` (${this.lbIdx+1}/${this.lbPhotos.length})` : '');
+    document.getElementById('lightbox').classList.add('on');
+  },
+
+  closeLightbox() {
+    document.getElementById('lightbox').classList.remove('on');
+    document.getElementById('lb-img').src = '';
+  },
+
+  lbNav(dir) {
+    this.lbIdx = (this.lbIdx + dir + this.lbPhotos.length) % this.lbPhotos.length;
+    this.showLightbox();
+  },
+
+  // Render photos in the detail modal
+  renderDetailPhotos(inspId) {
+    const photos = PhotoDB.get(inspId);
+    if (!photos.length) return '';
+    return `
+      <div style="margin-top:14px">
+        <div style="font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;text-transform:uppercase;font-size:11px">Photos (${photos.length})</div>
+        <div class="detail-photo-grid">
+          ${photos.map((p,i) => `
+            <div class="detail-photo-wrap" onclick="Photos.openLightbox(${JSON.stringify(photos).replace(/"/g,'&quot;')},${i})">
+              <img class="detail-photo" src="${p.dataUrl}">
+              <div class="detail-photo-lbl">${p.label}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  },
+
+  // Photo card HTML for inside the inspection form
+  formCard() {
+    return `
+    <div class="card">
+      <div class="card-t">Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('photo-input').click()">
+        <div class="photo-upload-icon">📷</div>
+        <div class="photo-upload-txt">Tap to add photos<br><strong>Queen · Brood · Anything interesting</strong></div>
+      </div>
+      <input type="file" id="photo-input" accept="image/*" multiple capture="environment"
+        style="display:none" onchange="Photos.handleFiles(this.files);this.value=''">
+      <div id="staged-photo-grid" class="photo-grid"></div>
+      <div id="staged-label-wrap" style="margin-top:10px"></div>
+    </div>`;
+  },
+};
+
+// ── App state ─────────────────────────────────────────────────────────────────
+let activeHive=null,detailId=null,detailType=null;
+
+function uid(){return '_'+Date.now()+Math.random().toString(36).slice(2,6);}
+function fmtDate(d){if(!d)return'';const p=d.split('-');return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1]-1]+' '+parseInt(p[2])+', '+p[0];}
+function el(id){return document.getElementById(id);}
+function qa(sel,ctx){return[...(ctx||document).querySelectorAll(sel)];}
+function gv(id){const e=el(id);return e?e.value.trim():'';}
+function gc(id){const e=el(id);return e?e.checked:false;}
+function pillVal(gid){const s=document.querySelector('#'+gid+' .pill.on');return s?s.textContent.trim():'';}
+function multiPillVal(gid){return qa('#'+gid+' .pill.on').map(p=>p.textContent.trim()).join(', ');}
+function scoreVal(id){const e=el(id);return e?e.value:'';}
+function lastInsp(hiveId,insps){return insps.filter(i=>i.hiveId===hiveId).sort((a,b)=>new Date(b.date)-new Date(a.date))[0]||null;}
+function hiveStatus(hiveId,insps){
+  const l=lastInsp(hiveId,insps);if(!l)return'x';
+  if(l.overall==='poor')return'r';if(l.overall==='fair')return'y';if(l.overall==='good')return'g';
+  const sc=[l.queenScore,l.broodScore,l.honeyScore,l.pestScore].filter(Boolean);
+  if(sc.includes('poor'))return'r';if(sc.includes('fair'))return'y';if(sc.length)return'g';return'x';
+}
+function scoreTag(v){
+  if(!v)return'tag-x';const lo=v.toLowerCase();
+  if(['good','none','solid','full','calm'].includes(lo))return'tag-g';
+  if(['fair','monitor','spotty','adequate','moderate'].includes(lo))return'tag-y';
+  return'tag-r';
+}
+function pickPill(el,gid){qa('#'+gid+' .pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function multiPill(el){el.classList.toggle('on');}
+function pickScore(el,rowId,hidId,val){
+  qa('#'+rowId+' .sbtn').forEach(b=>b.classList.remove('sg','sy','sr'));
+  el.classList.add(val==='good'||val==='none'?'sg':val==='fair'||val==='monitor'?'sy':'sr');
+  const h=document.getElementById(hidId);if(h)h.value=val;
+}
+function showSub(subId,show){const s=el(subId);if(s)s.classList.toggle('on',show);}
+function calcMites(){
+  const inp=el('f-mites');if(!inp)return;
+  const mites=inp.value.trim();const mbox=el('mbox');if(!mbox)return;
+  if(mites===''||isNaN(+mites)){mbox.style.display='none';return;}
+  const sampleTxt=pillVal('pg-sample');
+  const sz=sampleTxt.includes('200')?200:sampleTxt.includes('100')?100:300;
+  const rate=(+mites/sz)*100;
+  mbox.style.display='block';
+  el('mbox-rate').textContent=rate.toFixed(1)+'%';
+  const lbl=el('mbox-lbl');
+  if(rate<2){lbl.textContent='Low';lbl.className='mbox-lbl tag tag-g';}
+  else if(rate<3){lbl.textContent='Borderline';lbl.className='mbox-lbl tag tag-y';}
+  else{lbl.textContent='Treat now';lbl.className='mbox-lbl tag tag-r';}
+}
+
+const UI={
+  tab(name,btn){
+    qa('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');
+    qa('.scr').forEach(s=>s.classList.remove('on'));el('scr-'+name).classList.add('on');
+    if(name==='hives')this.renderHives();
+    if(name==='log')this.renderLogHives();
+    if(name==='history')this.renderHistory();
+  },
+
+  renderHives(){
+    const hives=DB.hives(),insps=DB.insps();
+    const weekAgo=new Date(Date.now()-7*864e5);
+    const recent=insps.filter(i=>new Date(i.date)>=weekAgo).length;
+    const healthy=hives.filter(h=>hiveStatus(h.id,insps)==='g').length;
+    el('stats').innerHTML=`<div class="stat"><div class="stat-n">${hives.length}</div><div class="stat-l">Hives</div></div><div class="stat"><div class="stat-n">${healthy}</div><div class="stat-l">Healthy</div></div><div class="stat"><div class="stat-n">${recent}</div><div class="stat-l">This week</div></div>`;
+    const list=el('hive-list');
+    if(!hives.length){list.innerHTML='<div class="empty"><div class="empty-i">🐝</div><p>No hives yet.</p></div>';return;}
+    list.innerHTML=hives.map(h=>{const st=hiveStatus(h.id,insps);const li=lastInsp(h.id,insps);return`<div class="hcard" onclick="UI.openHiveDetail('${h.id}')"><div><div class="hcard-name">${h.name}</div><div class="hcard-meta">${h.loc||''} · Last: ${li?fmtDate(li.date):'Never'}</div></div><div class="dot dot-${st}"></div></div>`;}).join('');
+  },
+
+  openAddHive(){
+    el('new-name').value='';el('new-loc').value='';
+    this.openModal('m-add');setTimeout(()=>el('new-name').focus(),80);
+  },
+
+  saveHive(){
+    const name=gv('new-name');if(!name){alert('Please enter a hive name.');return;}
+    const hives=DB.hives();hives.push({id:uid(),name,loc:gv('new-loc'),created:new Date().toISOString()});
+    DB.setHives(hives);this.closeModal('m-add');this.renderHives();this.populateSelects();
+  },
+
+  openHiveDetail(hiveId){
+    const hives=DB.hives(),insps=DB.insps();
+    const hive=hives.find(h=>h.id===hiveId);if(!hive)return;
+    detailType='hive';detailId=hiveId;
+    el('m-detail-t').textContent=hive.name;
+    el('m-detail-del').textContent='Remove hive';
+    const hi=insps.filter(i=>i.hiveId===hiveId).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    el('m-detail-body').innerHTML=`<div class="fg"><label>Location</label><div style="color:var(--text)">${hive.loc||'—'}</div></div><div class="fg"><label>Inspections</label><div style="color:var(--text)">${hi.length}</div></div>${hi.slice(0,3).map(i=>this.inspCard(i,hives,false)).join('')}${hi.length>3?`<p style="font-size:13px;color:var(--muted);text-align:center;margin-top:6px">+${hi.length-3} more in History</p>`:''}`;
+    this.openModal('m-detail');
+  },
+
+  renderLogHives(){
+    const hives=DB.hives();const list=el('log-hives');
+    if(!hives.length){list.innerHTML='<div class="empty"><p>Add a hive first on the Hives tab.</p></div>';el('log-form').innerHTML='';return;}
+    list.innerHTML=hives.map(h=>`<div class="hcard ${activeHive===h.id?'sel':''}" onclick="UI.selectHive('${h.id}')"><div><div class="hcard-name">${h.name}</div><div class="hcard-meta">${h.loc||''}</div></div></div>`).join('');
+    if(activeHive)this.renderForm();
+  },
+
+  selectHive(id){stagedPhotos=[];activeHive=id;this.renderLogHives();},
+
+  renderForm(){
+    const today=new Date().toISOString().split('T')[0];
+    el('log-form').innerHTML=`<hr class="div"><div class="slbl">Inspection details</div>
+<div class="card"><div class="card-t">Overall rating</div><div class="srow" id="sr-overall"><div class="sbtn" onclick="pickScore(this,'sr-overall','f-overall','good')">Good</div><div class="sbtn" onclick="pickScore(this,'sr-overall','f-overall','fair')">Fair</div><div class="sbtn" onclick="pickScore(this,'sr-overall','f-overall','poor')">Poor</div></div><input type="hidden" id="f-overall" value=""><div class="fg" style="margin-top:14px;margin-bottom:0"><label>Date</label><input type="date" id="f-date" value="${today}"></div></div>
+<div class="card"><div class="card-t">Queen</div><div class="fg"><label>Queen seen?</label><div class="pills" id="pg-qseen"><div class="pill" onclick="pickPill(this,'pg-qseen')">Yes</div><div class="pill" onclick="pickPill(this,'pg-qseen')">No</div><div class="pill" onclick="pickPill(this,'pg-qseen')">Eggs only</div></div></div><div class="fg"><label>Queen status</label><div class="srow" id="sr-queen"><div class="sbtn" onclick="pickScore(this,'sr-queen','f-queenscore','good')">Good</div><div class="sbtn" onclick="pickScore(this,'sr-queen','f-queenscore','fair')">Fair</div><div class="sbtn" onclick="pickScore(this,'sr-queen','f-queenscore','poor')">Poor</div></div><input type="hidden" id="f-queenscore" value=""></div><div class="fg"><label>Queen cells present?</label><div class="pills" id="pg-qcells"><div class="pill" onclick="pickPill(this,'pg-qcells');showSub('sub-qc',false)">None</div><div class="pill" onclick="pickPill(this,'pg-qcells');showSub('sub-qc',true)">Yes</div></div></div><div class="sub" id="sub-qc"><div class="fg"><label>Cell type — select all that apply</label><div class="pills" id="pg-qctype"><div class="pill pill-sm" onclick="multiPill(this)">Swarm</div><div class="pill pill-sm" onclick="multiPill(this)">Supersedure</div><div class="pill pill-sm" onclick="multiPill(this)">Emergency</div><div class="pill pill-sm" onclick="multiPill(this)">Capped</div><div class="pill pill-sm" onclick="multiPill(this)">Open</div><div class="pill pill-sm" onclick="multiPill(this)">Removed</div></div></div><div class="fg" style="margin-bottom:0"><label>Number of cells</label><input type="text" id="f-qccount" placeholder="e.g. 3"></div></div></div>
+<div class="card"><div class="card-t">Brood</div><div class="fg" style="margin-bottom:0"><label>Brood pattern</label><div class="srow" id="sr-brood"><div class="sbtn" onclick="pickScore(this,'sr-brood','f-broodscore','good')">Solid</div><div class="sbtn" onclick="pickScore(this,'sr-brood','f-broodscore','fair')">Spotty</div><div class="sbtn" onclick="pickScore(this,'sr-brood','f-broodscore','poor')">Poor</div></div><input type="hidden" id="f-broodscore" value=""></div></div>
+<div class="card"><div class="card-t">Colony</div><div class="fg"><label>Population strength</label><div class="pills" id="pg-pop"><div class="pill pill-sm" onclick="pickPill(this,'pg-pop')">Light</div><div class="pill pill-sm" onclick="pickPill(this,'pg-pop')">Medium</div><div class="pill pill-sm" onclick="pickPill(this,'pg-pop')">Strong</div><div class="pill pill-sm" onclick="pickPill(this,'pg-pop')">Booming</div></div></div><div class="fg" style="margin-bottom:0"><label>Temperament</label><div class="pills" id="pg-temp"><div class="pill pill-sm" onclick="pickPill(this,'pg-temp')">Calm</div><div class="pill pill-sm" onclick="pickPill(this,'pg-temp')">Moderate</div><div class="pill pill-sm" onclick="pickPill(this,'pg-temp')">Defensive</div></div></div></div>
+<div class="card"><div class="card-t">Honey & stores</div><div class="fg" style="margin-bottom:0"><label>Store level</label><div class="srow" id="sr-honey"><div class="sbtn" onclick="pickScore(this,'sr-honey','f-honeyscore','good')">Full</div><div class="sbtn" onclick="pickScore(this,'sr-honey','f-honeyscore','fair')">Adequate</div><div class="sbtn" onclick="pickScore(this,'sr-honey','f-honeyscore','poor')">Low</div></div><input type="hidden" id="f-honeyscore" value=""></div></div>
+<div class="card"><div class="card-t">Varroa — alcohol wash</div><div class="fg"><label>Mites counted</label><input type="number" id="f-mites" min="0" placeholder="# of mites" oninput="calcMites()"></div><div class="fg"><label>Sample size</label><div class="pills" id="pg-sample"><div class="pill pill-sm on" onclick="pickPill(this,'pg-sample');calcMites()">300 bees (1 cup)</div><div class="pill pill-sm" onclick="pickPill(this,'pg-sample');calcMites()">200 bees</div><div class="pill pill-sm" onclick="pickPill(this,'pg-sample');calcMites()">100 bees</div></div></div><div class="mbox" id="mbox"><div><span class="mbox-rate" id="mbox-rate"></span><span class="mbox-unit">mites / 100 bees</span><span class="mbox-lbl" id="mbox-lbl"></span></div><div class="mbox-note">Threshold: treat at ≥2% spring/summer · ≥3% fall</div></div><div class="fg"><label>Other pest / disease notes</label><input type="text" id="f-pest" placeholder="SHB, nosema, chalkbrood, EFB…"></div><div class="fg" style="margin-top:4px;margin-bottom:0"><label>Pest concern level</label><div class="srow" id="sr-pest"><div class="sbtn" onclick="pickScore(this,'sr-pest','f-pestscore','good')">None</div><div class="sbtn" onclick="pickScore(this,'sr-pest','f-pestscore','fair')">Monitor</div><div class="sbtn" onclick="pickScore(this,'sr-pest','f-pestscore','poor')">Treat</div></div><input type="hidden" id="f-pestscore" value=""></div></div>
+<div class="card"><div class="card-t">Swarm activity</div><div class="fg" style="margin-bottom:0"><label>Signs of swarming?</label><div class="pills" id="pg-swarm"><div class="pill pill-sm" onclick="pickPill(this,'pg-swarm')">None</div><div class="pill pill-sm" onclick="pickPill(this,'pg-swarm')">Suspected</div><div class="pill pill-sm" onclick="pickPill(this,'pg-swarm')">Swarmed</div><div class="pill pill-sm" onclick="pickPill(this,'pg-swarm')">Caught swarm</div></div></div></div>
+<div class="card"><div class="card-t">Equipment</div><div class="trow" style="border-bottom:none"><span class="trow-lbl">Equipment changes made?</span><label class="tog"><input type="checkbox" id="f-equip" onchange="showSub('sub-equip',this.checked)"><span class="tog-tr"></span></label></div><div class="sub" id="sub-equip"><div class="fg" style="margin-top:10px;margin-bottom:0"><label>What changed?</label><input type="text" id="f-equip-notes" placeholder="e.g. Added honey super, replaced bottom board"></div></div></div>
+<div class="card"><div class="card-t">Feeding</div><div class="trow"><span class="trow-lbl">Fed this visit?</span><label class="tog"><input type="checkbox" id="f-fed"><span class="tog-tr"></span></label></div><div class="fg" style="margin-top:12px;margin-bottom:0"><label>Feed type / amount</label><input type="text" id="f-feedtype" placeholder="e.g. 1:1 syrup 1 qt · pollen patty"></div></div>
+<div class="card"><div class="card-t">Treatment</div><div class="trow"><span class="trow-lbl">Treated this visit?</span><label class="tog"><input type="checkbox" id="f-treated"><span class="tog-tr"></span></label></div><div class="fg" style="margin-top:12px;margin-bottom:0"><label>Treatment used</label><input type="text" id="f-treatment" placeholder="e.g. Apivar strips, OA dribble, HopGuard"></div></div>
+<div class="card"><div class="fg" style="margin-bottom:0"><label>Notes</label><textarea id="f-notes" placeholder="Follow-up needed, observations, concerns…"></textarea></div></div>
+${Photos.formCard()}
+<button class="btn btn-p" style="margin-top:4px" onclick="UI.saveInsp()">Save inspection</button><div style="height:20px"></div>`;
+  },
+
+  saveInsp(){
+    const date=gv('f-date');if(!date){alert('Please select a date.');return;}
+    const mites=el('f-mites')?el('f-mites').value.trim():'';
+    const sampleTxt=pillVal('pg-sample');
+    const sz=sampleTxt.includes('200')?200:sampleTxt.includes('100')?100:300;
+    const miteRate=mites!==''&&!isNaN(+mites)?((+mites/sz)*100).toFixed(1)+'%':'';
+    const rec={id:uid(),hiveId:activeHive,date,overall:scoreVal('f-overall'),queenSeen:pillVal('pg-qseen'),queenScore:scoreVal('f-queenscore'),queenCells:pillVal('pg-qcells'),qcType:multiPillVal('pg-qctype'),qcCount:gv('f-qccount'),broodScore:scoreVal('f-broodscore'),population:pillVal('pg-pop'),temperament:pillVal('pg-temp'),honeyScore:scoreVal('f-honeyscore'),mites,mitesSample:sampleTxt,miteRate,pestNotes:gv('f-pest'),pestScore:scoreVal('f-pestscore'),swarm:pillVal('pg-swarm'),equipChanged:gc('f-equip'),equipNotes:gv('f-equip-notes'),fed:gc('f-fed'),feedType:gv('f-feedtype'),treated:gc('f-treated'),treatment:gv('f-treatment'),notes:gv('f-notes'),savedAt:new Date().toISOString()};
+    const insps=DB.insps();insps.push(rec);DB.setInsps(insps);
+    Photos.saveForInsp(rec.id);
+    activeHive=null;
+    el('log-form').innerHTML=`<div style="text-align:center;padding:40px 0;color:var(--text)"><div style="font-size:40px">✓</div><p style="font-weight:500;margin-top:10px">Inspection saved!</p></div>`;
+    this.renderLogHives();setTimeout(()=>{el('log-form').innerHTML='';this.renderLogHives();},2000);
+  },
+
+  renderHistory(){
+    const hives=DB.hives(),filter=el('hist-filter').value;
+    let insps=DB.insps().sort((a,b)=>new Date(b.date)-new Date(a.date));
+    if(filter)insps=insps.filter(i=>i.hiveId===filter);
+    const list=el('hist-list');
+    if(!insps.length){list.innerHTML='<div class="empty"><div class="empty-i">📋</div><p>No inspections yet.</p></div>';return;}
+    list.innerHTML=insps.map(i=>this.inspCard(i,hives,true)).join('');
+  },
+
+  inspCard(i,hives,clickable){
+    const hive=hives.find(h=>h.id===i.hiveId);
+    const photoCount=PhotoDB.count(i.id);
+    const tags=[];
+    if(i.overall)tags.push({l:'Overall: '+i.overall,c:scoreTag(i.overall)});
+    if(i.queenScore)tags.push({l:'Queen: '+i.queenScore,c:scoreTag(i.queenScore)});
+    if(i.queenCells==='Yes')tags.push({l:'Queen cells'+(i.qcType?': '+i.qcType:''),c:'tag-y'});
+    if(i.broodScore)tags.push({l:'Brood: '+i.broodScore,c:scoreTag(i.broodScore)});
+    if(i.honeyScore)tags.push({l:'Stores: '+i.honeyScore,c:scoreTag(i.honeyScore)});
+    if(i.miteRate)tags.push({l:'Varroa: '+i.miteRate,c:parseFloat(i.miteRate)>=3?'tag-r':parseFloat(i.miteRate)>=2?'tag-y':'tag-g'});
+    if(i.pestScore)tags.push({l:'Pests: '+i.pestScore,c:scoreTag(i.pestScore)});
+    if(i.population)tags.push({l:i.population,c:'tag-x'});
+    if(i.swarm&&i.swarm!=='None')tags.push({l:'Swarm: '+i.swarm,c:'tag-r'});
+    if(i.fed)tags.push({l:'Fed',c:'tag-x'});
+    if(i.treated)tags.push({l:'Treated',c:'tag-b'});
+    if(i.equipChanged)tags.push({l:'Equipment',c:'tag-x'});
+    if(photoCount>0)tags.push({l:'📷 '+photoCount+' photo'+(photoCount>1?'s':''),c:'tag-b'});
+    const click=clickable?`onclick="UI.openInspDetail('${i.id}')"` :'';
+    return`<div class="iitem" ${click}><div class="iitem-hdr"><div class="iitem-hive">${hive?hive.name:'Unknown'}</div><div class="iitem-date">${fmtDate(i.date)}</div></div>${i.notes?`<div class="iitem-note">${i.notes}</div>`:''}<div class="tags">${tags.map(t=>`<span class="tag ${t.c}">${t.l}</span>`).join('')}</div></div>`;
+  },
+
+  openInspDetail(id){
+    const insps=DB.insps(),hives=DB.hives();
+    const i=insps.find(x=>x.id===id);if(!i)return;
+    const hive=hives.find(h=>h.id===i.hiveId);
+    detailType='insp';detailId=id;
+    el('m-detail-t').textContent=(hive?hive.name:'?')+' · '+fmtDate(i.date);
+    el('m-detail-del').textContent='Delete inspection';
+    const rows=[['Overall',i.overall||'—'],['Queen seen',i.queenSeen||'—'],['Queen status',i.queenScore||'—'],['Queen cells',i.queenCells||'—'],['Cell type',i.qcType||'—'],['Cell count',i.qcCount||'—'],['Brood pattern',i.broodScore||'—'],['Population',i.population||'—'],['Temperament',i.temperament||'—'],['Honey stores',i.honeyScore||'—'],['Varroa mites',i.mites?(i.mites+' / '+i.mitesSample):'—'],['Mite rate',i.miteRate||'—'],['Other pests',i.pestNotes||'—'],['Pest level',i.pestScore||'—'],['Swarm',i.swarm||'—'],['Equipment',i.equipChanged?('Yes'+(i.equipNotes?': '+i.equipNotes:'')):'No'],['Fed',i.fed?('Yes'+(i.feedType?': '+i.feedType:'')):'No'],['Treated',i.treated?('Yes'+(i.treatment?': '+i.treatment:'')):'No'],['Notes',i.notes||'—']];
+    el('m-detail-body').innerHTML=`<table class="dtbl">${rows.map(([k,v])=>`<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`).join('')}</table>${Photos.renderDetailPhotos(id)}`;
+    this.openModal('m-detail');
+  },
+
+  deleteItem(){
+    if(!detailId)return;
+    if(detailType==='insp'){
+      if(!confirm('Delete this inspection?'))return;
+      PhotoDB.del(detailId);
+      DB.setInsps(DB.insps().filter(i=>i.id!==detailId));
+      this.closeModal('m-detail');this.renderHistory();this.renderHives();
+    }else{
+      if(!confirm('Remove this hive and ALL its inspections?'))return;
+      DB.insps().filter(i=>i.hiveId===detailId).forEach(i=>PhotoDB.del(i.id));
+      DB.setHives(DB.hives().filter(h=>h.id!==detailId));
+      DB.setInsps(DB.insps().filter(i=>i.hiveId!==detailId));
+      this.closeModal('m-detail');this.renderHives();this.populateSelects();
+    }
+    detailId=null;detailType=null;
+  },
+
+  showExport(){this.populateSelects();this.openModal('m-export');},
+
+  doExport(){
+    const hives=DB.hives(),filter=el('exp-filter').value;
+    let insps=DB.insps().sort((a,b)=>new Date(a.date)-new Date(b.date));
+    if(filter)insps=insps.filter(i=>i.hiveId===filter);
+    if(!insps.length){alert('No inspections to export.');return;}
+    const hdrs=['Date','Hive','Overall','Queen Seen','Queen Status','Queen Cells','Cell Type','Cell Count','Brood','Population','Temperament','Honey Stores','Varroa Mites','Varroa Sample','Mite Rate','Other Pest Notes','Pest Level','Swarm','Equipment Changed','Equipment Notes','Fed','Feed Type','Treated','Treatment','Notes','Photo Count'];
+    const rows=insps.map(i=>{const hive=hives.find(h=>h.id===i.hiveId);return[i.date,hive?hive.name:i.hiveId,i.overall,i.queenSeen,i.queenScore,i.queenCells,i.qcType,i.qcCount,i.broodScore,i.population,i.temperament,i.honeyScore,i.mites,i.mitesSample,i.miteRate,i.pestNotes,i.pestScore,i.swarm,i.equipChanged?'Yes':'No',i.equipNotes,i.fed?'Yes':'No',i.feedType,i.treated?'Yes':'No',i.treatment,i.notes,PhotoDB.count(i.id)].map(v=>'"'+(v||'').toString().replace(/"/g,'""')+'"');});
+    const csv=[hdrs,...rows].map(r=>r.join(',')).join('\n');
+    const a=document.createElement('a');
+    a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+    a.download='belles-honey-inspections.csv';a.click();
+    this.closeModal('m-export');
+  },
+
+  openModal(id){el(id).classList.add('on');},
+  closeModal(id){el(id).classList.remove('on');},
+  populateSelects(){
+    const opts='<option value="">All hives</option>'+DB.hives().map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
+    ['hist-filter','exp-filter'].forEach(id=>{const e=el(id);if(e)e.innerHTML=opts;});
+  },
+};
+
+UI.renderHives();
+UI.populateSelects();
+</script>
+</body>
+</html>
