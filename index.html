@@ -136,6 +136,24 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
 /* ── Edit button ── */
 .edit-btn{background:none;border:1px solid var(--border2);border-radius:8px;color:var(--muted);font-size:15px;padding:4px 8px;cursor:pointer;flex-shrink:0;margin-left:6px;line-height:1}
 .edit-btn:active{background:var(--surf2)}
+
+/* ── Splits ── */
+.split-item{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;cursor:pointer}
+.split-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.split-title{font-weight:500;font-size:14px;color:var(--text)}
+.split-date{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.split-meta{font-size:13px;color:var(--muted);margin-top:2px}
+.split-source-badge{display:inline-block;font-size:11px;padding:3px 8px;border-radius:10px;font-family:'IBM Plex Mono',monospace;margin-top:5px;background:var(--blue-l);color:var(--blue)}
+
+/* ── Lineage tree ── */
+.lineage-node{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surf);margin-bottom:6px;position:relative}
+.lineage-node.current{border-color:var(--amber);background:var(--amber-l)}
+.lineage-node.ancestor{border-color:var(--blue);background:var(--blue-l)}
+.lineage-node.descendant{border-color:var(--green);background:var(--green-l)}
+.lineage-connector{width:2px;height:14px;background:var(--border2);margin:0 auto 0 20px}
+.lineage-label{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.lineage-name{font-weight:500;font-size:14px;color:var(--text)}
+.lineage-detail{font-size:12px;color:var(--muted);margin-top:2px}
 .qcolor-swatch{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 8px;border-radius:10px;border:2px solid transparent;transition:border-color .15s;user-select:none;-webkit-tap-highlight-color:transparent}
 .qcolor-swatch.on{border-color:var(--amber) !important;background:var(--amber-l)}
 .qcolor-dot{width:32px;height:32px;border-radius:50%;display:block;box-shadow:0 1px 3px rgba(0,0,0,.2)}
@@ -173,13 +191,17 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
 <body>
 <div id="app">
   <div class="hdr">
-    <div><div class="hdr-title">Belle's Honey</div><div class="hdr-sub">hive inspection log</div></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="data:image/jpeg;base64,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" alt="Belle's Bees" style="height:42px;width:42px;object-fit:cover;border-radius:6px">
+      <div><div class="hdr-title">Belle's Honey</div><div class="hdr-sub">hive inspection log</div></div>
+    </div>
     <button class="btn btn-sm" style="width:auto;margin-bottom:0" onclick="UI.showExport()">Export CSV</button>
   </div>
   <div class="tabs">
     <button class="tab on" onclick="UI.tab('hives',this)">Hives</button>
     <button class="tab" onclick="UI.tab('yards',this)">Yards</button>
     <button class="tab" onclick="UI.tab('log',this)">Log</button>
+    <button class="tab" onclick="UI.tab('splits',this)">Splits</button>
     <button class="tab" onclick="UI.tab('history',this)">History</button>
   </div>
 
@@ -194,6 +216,14 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     <div class="slbl">Your yards</div>
     <div id="yard-list"></div>
     <button class="btn" onclick="UI.openAddYard()">+ Add yard</button>
+  </div>
+
+  <div id="scr-splits" class="scr">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="slbl" style="margin:0">Split log</div>
+      <button class="btn btn-sm btn-p" style="margin:0" onclick="UI.openAddSplit()">+ Log split</button>
+    </div>
+    <div id="split-list"></div>
   </div>
 
   <div id="scr-log" class="scr">
@@ -267,6 +297,71 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
   </div>
 </div>
 
+<!-- LOG SPLIT -->
+<div class="overlay" id="m-add-split">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-t">Log split</span><button class="modal-x" onclick="UI.closeModal('m-add-split')">×</button></div>
+    <div class="fg"><label>Date</label><input type="date" id="split-date"></div>
+    <div class="fg"><label>Parent colony <span style="font-size:11px;color:var(--muted);font-weight:400">— hive being split</span></label><select id="split-parent"><option value="">Select parent colony…</option></select></div>
+    <div class="fg"><label>Daughter colony <span style="font-size:11px;color:var(--muted);font-weight:400">— new hive created</span></label><select id="split-daughter"><option value="">Select daughter colony…</option></select></div>
+    <div class="fg"><label>Queen source</label>
+      <div class="pills" id="pg-qsource" style="flex-wrap:wrap;gap:6px">
+        <div class="pill pill-sm" onclick="pickPill(this,'pg-qsource');showSplitSource()">Walk-away</div>
+        <div class="pill pill-sm" onclick="pickPill(this,'pg-qsource');showSplitSource()">Queen cells from parent</div>
+        <div class="pill pill-sm" onclick="pickPill(this,'pg-qsource');showSplitSource()">Grafted</div>
+        <div class="pill pill-sm" onclick="pickPill(this,'pg-qsource');showSplitSource()">Mated from own yard</div>
+        <div class="pill pill-sm" onclick="pickPill(this,'pg-qsource');showSplitSource()">Purchased queen</div>
+      </div>
+    </div>
+    <div id="split-source-detail" style="display:none">
+      <div class="fg" id="split-source-hive-wrap">
+        <label id="split-source-hive-lbl">Source colony <span style="font-size:11px;color:var(--muted);font-weight:400">— colony that provided genetics</span></label>
+        <select id="split-source-hive"><option value="">Select colony…</option></select>
+      </div>
+      <div class="fg" id="split-purchased-wrap" style="display:none">
+        <label>Queen source / supplier</label>
+        <input type="text" id="split-purchased-src" placeholder="e.g. Mann Lake, local breeder, VSH line">
+      </div>
+    </div>
+    <div class="fg"><label>Parent queen action <span style="font-size:11px;color:var(--muted);font-weight:400">— what happened to the original queen</span></label>
+      <div class="pills" id="pg-parent-queen">
+        <div class="pill pill-sm" onclick="pickPill(this,'pg-parent-queen')">Stayed in parent</div>
+        <div class="pill pill-sm" onclick="pickPill(this,'pg-parent-queen')">Went with split</div>
+        <div class="pill pill-sm" onclick="pickPill(this,'pg-parent-queen')">Removed</div>
+        <div class="pill pill-sm" onclick="pickPill(this,'pg-parent-queen')">Unknown</div>
+      </div>
+    </div>
+    <div class="fg"><label>Notes</label><textarea id="split-notes" placeholder="Frame count, condition of split, follow-up needed…" style="min-height:60px"></textarea></div>
+    <div class="btn-row">
+      <button class="btn" onclick="UI.closeModal('m-add-split')">Cancel</button>
+      <button class="btn btn-p" onclick="UI.saveSplit()">Save split</button>
+    </div>
+  </div>
+</div>
+
+<!-- SPLIT DETAIL -->
+<div class="overlay" id="m-split-detail">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-t" id="m-split-t">Split detail</span><button class="modal-x" onclick="UI.closeModal('m-split-detail')">×</button></div>
+    <div id="m-split-body"></div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-d btn-sm" onclick="UI.deleteSplit()">Delete</button>
+      <button class="btn btn-sm" onclick="UI.closeModal('m-split-detail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- LINEAGE TREE -->
+<div class="overlay" id="m-lineage">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-t" id="m-lineage-t">Queen lineage</span><button class="modal-x" onclick="UI.closeModal('m-lineage')">×</button></div>
+    <div id="m-lineage-body"></div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn" onclick="UI.closeModal('m-lineage')">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- DETAIL -->
 <div class="overlay" id="m-detail">
   <div class="modal">
@@ -309,9 +404,11 @@ const DB={
   hives(){try{return JSON.parse(localStorage.getItem('bh_hives'))||[];}catch{return[];}},
   insps(){try{return JSON.parse(localStorage.getItem('bh_insps'))||[];}catch{return[];}},
   yards(){try{return JSON.parse(localStorage.getItem('bh_yards'))||[];}catch{return[];}},
+  splits(){try{return JSON.parse(localStorage.getItem('bh_splits'))||[];}catch{return[];}},
   setHives(v){localStorage.setItem('bh_hives',JSON.stringify(v));},
   setInsps(v){localStorage.setItem('bh_insps',JSON.stringify(v));},
   setYards(v){localStorage.setItem('bh_yards',JSON.stringify(v));},
+  setSplits(v){localStorage.setItem('bh_splits',JSON.stringify(v));},
 };
 
 // ── Photo storage — kept separate to avoid hitting localStorage size limits ──
@@ -519,6 +616,27 @@ function scoreTag(v){
 }
 function pickPill(el,gid){qa('#'+gid+' .pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
 function pickColor(el){qa('#pg-qcolor .qcolor-swatch').forEach(s=>s.classList.remove('on'));el.classList.add('on');}
+function showSplitSource(){
+  const val=pillVal('pg-qsource');
+  const detail=el('split-source-detail');
+  const hiveWrap=el('split-source-hive-wrap');
+  const purchasedWrap=el('split-purchased-wrap');
+  const lbl=el('split-source-hive-lbl');
+  if(!val||val==='Walk-away'||val==='Queen cells from parent'){
+    detail.style.display='none'; return;
+  }
+  detail.style.display='block';
+  if(val==='Purchased queen'){
+    hiveWrap.style.display='none';
+    purchasedWrap.style.display='block';
+  } else {
+    hiveWrap.style.display='block';
+    purchasedWrap.style.display='none';
+    if(lbl) lbl.innerHTML=val==='Grafted'
+      ?'Grafted from colony <span style="font-size:11px;color:var(--muted);font-weight:400">— source of larvae</span>'
+      :'Mated from colony <span style="font-size:11px;color:var(--muted);font-weight:400">— source of genetics</span>';
+  }
+}
 function multiPill(el){el.classList.toggle('on');}
 function pickScore(el,rowId,hidId,val){
   qa('#'+rowId+' .sbtn').forEach(b=>b.classList.remove('sg','sy','sr'));
@@ -548,6 +666,7 @@ const UI={
     if(name==='hives')  this.renderHives();
     if(name==='yards')  this.renderYards();
     if(name==='log')    this.renderLogHives();
+    if(name==='splits') this.renderSplits();
     if(name==='history')this.renderHistory();
   },
 
@@ -677,19 +796,222 @@ const UI={
     const e=el(selectId);if(e)e.innerHTML=opts;
   },
 
+  // ── Splits ────────────────────────────────────────────────────────────────
+  renderSplits(){
+    const splits=DB.splits().sort((a,b)=>new Date(b.date)-new Date(a.date));
+    const hives=DB.hives();
+    const list=el('split-list');
+    if(!splits.length){
+      list.innerHTML='<div class="empty"><div class="empty-i">✂️</div><p>No splits logged yet.</p></div>';
+      return;
+    }
+    list.innerHTML=splits.map(s=>{
+      const parent=hives.find(h=>h.id===s.parentHiveId);
+      const daughter=hives.find(h=>h.id===s.daughterHiveId);
+      const srcHive=hives.find(h=>h.id===s.queenSourceHiveId);
+      let sourceStr=s.queenSource||'';
+      if(srcHive&&(s.queenSource==='Grafted'||s.queenSource==='Mated from own yard'))
+        sourceStr+=` (from ${srcHive.name})`;
+      if(s.queenSource==='Purchased queen'&&s.purchasedSource)
+        sourceStr+=` — ${s.purchasedSource}`;
+      return`<div class="split-item" onclick="UI.openSplitDetail('${s.id}')">
+        <div class="split-hdr">
+          <div class="split-title">${parent?parent.name:'?'} → ${daughter?daughter.name:'?'}</div>
+          <div class="split-date">${fmtDate(s.date)}</div>
+        </div>
+        <div class="split-meta">${sourceStr}</div>
+        ${s.notes?`<div class="split-meta" style="margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.notes}</div>`:''}
+        <span class="split-source-badge">${s.queenSource||'Queen source unset'}</span>
+      </div>`;
+    }).join('');
+  },
+
+  openAddSplit(){
+    const today=new Date().toISOString().split('T')[0];
+    el('split-date').value=today;
+    this.populateSplitHiveSelects();
+    qa('#pg-qsource .pill').forEach(p=>p.classList.remove('on'));
+    qa('#pg-parent-queen .pill').forEach(p=>p.classList.remove('on'));
+    el('split-notes').value='';
+    el('split-source-detail').style.display='none';
+    el('split-purchased-wrap').style.display='none';
+    this.openModal('m-add-split');
+  },
+
+  populateSplitHiveSelects(){
+    const hives=DB.hives();
+    const opts='<option value="">Select colony…</option>'+hives.map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
+    ['split-parent','split-daughter','split-source-hive'].forEach(id=>{const e=el(id);if(e)e.innerHTML=opts;});
+  },
+
+  saveSplit(){
+    const date=gv('split-date');
+    if(!date){alert('Please select a date.');return;}
+    const parentId=el('split-parent').value;
+    const daughterId=el('split-daughter').value;
+    if(!parentId||!daughterId){alert('Please select both parent and daughter colonies.');return;}
+    if(parentId===daughterId){alert('Parent and daughter must be different colonies.');return;}
+    const queenSource=pillVal('pg-qsource');
+    if(!queenSource){alert('Please select a queen source.');return;}
+    const rec={
+      id:uid(),date,
+      parentHiveId:parentId,
+      daughterHiveId:daughterId,
+      queenSource,
+      queenSourceHiveId:el('split-source-hive').value||'',
+      purchasedSource:gv('split-purchased-src'),
+      parentQueenAction:pillVal('pg-parent-queen'),
+      notes:gv('split-notes'),
+      savedAt:new Date().toISOString()
+    };
+    const splits=DB.splits();splits.push(rec);DB.setSplits(splits);
+    this.closeModal('m-add-split');
+    this.renderSplits();
+  },
+
+  openSplitDetail(splitId){
+    const splits=DB.splits(),hives=DB.hives();
+    const s=splits.find(x=>x.id===splitId);if(!s)return;
+    const parent=hives.find(h=>h.id===s.parentHiveId);
+    const daughter=hives.find(h=>h.id===s.daughterHiveId);
+    const srcHive=hives.find(h=>h.id===s.queenSourceHiveId);
+    detailId=splitId; detailType='split';
+    el('m-split-t').textContent=`Split — ${fmtDate(s.date)}`;
+    const rows=[
+      ['Date',fmtDate(s.date)],
+      ['Parent colony',parent?parent.name:'—'],
+      ['Daughter colony',daughter?daughter.name:'—'],
+      ['Queen source',s.queenSource||'—'],
+      ['Source colony',srcHive?srcHive.name:'—'],
+      ['Purchased from',s.purchasedSource||'—'],
+      ['Parent queen',s.parentQueenAction||'—'],
+      ['Notes',s.notes||'—'],
+    ];
+    el('m-split-body').innerHTML=`
+      <table class="dtbl">${rows.map(([k,v])=>`<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`).join('')}</table>
+      <div style="margin-top:14px;display:flex;gap:8px">
+        ${parent?`<button class="btn btn-sm" style="flex:1" onclick="UI.closeModal('m-split-detail');UI.openLineage('${parent.id}')">🌿 ${parent.name} lineage</button>`:''}
+        ${daughter?`<button class="btn btn-sm" style="flex:1" onclick="UI.closeModal('m-split-detail');UI.openLineage('${daughter.id}')">🌿 ${daughter.name} lineage</button>`:''}
+      </div>`;
+    this.openModal('m-split-detail');
+  },
+
+  deleteSplit(){
+    if(!detailId||detailType!=='split')return;
+    if(!confirm('Delete this split record?'))return;
+    DB.setSplits(DB.splits().filter(s=>s.id!==detailId));
+    detailId=null;detailType=null;
+    this.closeModal('m-split-detail');
+    this.renderSplits();
+  },
+
+  // ── Lineage tree ──────────────────────────────────────────────────────────
+  openLineage(hiveId){
+    const hives=DB.hives(),splits=DB.splits();
+    const hive=hives.find(h=>h.id===hiveId);if(!hive)return;
+    el('m-lineage-t').textContent=`${hive.name} — Queen Lineage`;
+
+    // Build ancestor chain (walk up through queen source)
+    const ancestors=[];
+    let current=hiveId;
+    const visited=new Set();
+    while(current&&!visited.has(current)){
+      visited.add(current);
+      // Find the split that created this colony (where it was the daughter)
+      const originSplit=splits.find(s=>s.daughterHiveId===current);
+      if(!originSplit)break;
+      const srcId=originSplit.queenSourceHiveId||originSplit.parentHiveId;
+      if(!srcId)break;
+      ancestors.push({split:originSplit,hiveId:srcId});
+      current=srcId;
+    }
+
+    // Build descendant tree (colonies whose queens trace back to this hive)
+    const findDescendants=(hId,depth=0)=>{
+      if(depth>10)return[];
+      const results=[];
+      splits.filter(s=>(s.queenSourceHiveId===hId||s.parentHiveId===hId)&&s.daughterHiveId!==hId)
+        .forEach(s=>{
+          const dh=hives.find(h=>h.id===s.daughterHiveId);
+          if(dh){
+            results.push({hive:dh,split:s,depth,children:findDescendants(dh.id,depth+1)});
+          }
+        });
+      return results;
+    };
+    const descendants=findDescendants(hiveId);
+
+    // Render
+    const renderDesc=(nodes,depth=0)=>nodes.map(n=>`
+      <div style="margin-left:${depth*16}px">
+        <div class="lineage-connector"></div>
+        <div class="lineage-node descendant">
+          <div class="lineage-label">↓ Split ${fmtDate(n.split.date)} · ${n.split.queenSource||''}</div>
+          <div class="lineage-name">${n.hive.name}</div>
+          ${n.split.parentQueenAction?`<div class="lineage-detail">Parent queen: ${n.split.parentQueenAction}</div>`:''}
+          <button class="btn btn-sm" style="margin-top:6px;width:auto" onclick="UI.closeModal('m-lineage');UI.openLineage('${n.hive.id}')">View ${n.hive.name} lineage →</button>
+        </div>
+        ${n.children.length?renderDesc(n.children,0):''}
+      </div>`).join('');
+
+    let html='';
+    // Ancestors (top to bottom = oldest to most recent)
+    [...ancestors].reverse().forEach((a,i)=>{
+      const ah=hives.find(h=>h.id===a.hiveId);
+      if(!ah)return;
+      html+=`<div class="lineage-node ancestor">
+        <div class="lineage-label">Ancestor colony</div>
+        <div class="lineage-name">${ah.name}</div>
+        <div class="lineage-detail">${a.split.queenSource||''} · ${fmtDate(a.split.date)}</div>
+        <button class="btn btn-sm" style="margin-top:6px;width:auto" onclick="UI.closeModal('m-lineage');UI.openLineage('${ah.id}')">View ${ah.name} lineage →</button>
+      </div>
+      <div class="lineage-connector"></div>`;
+    });
+
+    // Current hive
+    html+=`<div class="lineage-node current">
+      <div class="lineage-label">This colony</div>
+      <div class="lineage-name">${hive.name}</div>
+      ${ancestors.length?`<div class="lineage-detail">Queen from: ${(()=>{const s=ancestors[0]?.split;const src=hives.find(h=>h.id===s?.queenSourceHiveId)||hives.find(h=>h.id===s?.parentHiveId);return src?src.name+' ('+fmtDate(s.date)+')':'unknown';})()}</div>`:'<div class="lineage-detail">No recorded queen lineage</div>'}
+    </div>`;
+
+    // Descendants
+    if(descendants.length){
+      html+=renderDesc(descendants);
+    } else if(!ancestors.length){
+      html+=`<div style="font-size:13px;color:var(--muted);text-align:center;margin-top:12px">No splits recorded from this colony yet.</div>`;
+    }
+
+    el('m-lineage-body').innerHTML=html;
+    this.openModal('m-lineage');
+  },
+
   openHiveDetail(hiveId){
-    const hives=DB.hives(),insps=DB.insps(),yards=DB.yards();
+    const hives=DB.hives(),insps=DB.insps(),yards=DB.yards(),splits=DB.splits();
     const hive=hives.find(h=>h.id===hiveId);if(!hive)return;
     detailType='hive';detailId=hiveId;
     el('m-detail-t').textContent=hive.name;
     el('m-detail-del').textContent='Remove hive';
     const yard=yards.find(y=>y.id===hive.yardId);
     const hi=insps.filter(i=>i.hiveId===hiveId).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    // Lineage summary
+    const originSplit=splits.find(s=>s.daughterHiveId===hiveId);
+    const parentHive=originSplit?hives.find(h=>h.id===originSplit.parentHiveId):null;
+    const queenSrcHive=originSplit?hives.find(h=>h.id===originSplit.queenSourceHiveId):null;
+    const lineageStr=originSplit
+      ?`Split from ${parentHive?parentHive.name:'unknown'} on ${fmtDate(originSplit.date)} · ${originSplit.queenSource||''}`
+      :'No split origin recorded';
+    const descendants=splits.filter(s=>s.parentHiveId===hiveId||s.queenSourceHiveId===hiveId);
     el('m-detail-body').innerHTML=`
       <div class="fg"><label>Yard</label><div style="color:var(--text)">${yard?yard.name:'—'}</div></div>
       <div class="fg"><label>Location</label><div style="color:var(--text)">${hive.loc||'—'}</div></div>
+      <div class="fg"><label>Queen origin</label><div style="color:var(--text);font-size:13px">${lineageStr}</div></div>
+      <div class="fg"><label>Descendants</label><div style="color:var(--text)">${descendants.length} split${descendants.length!==1?'s':''} recorded from this colony</div></div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button class="btn btn-sm" style="flex:1" onclick="UI.closeModal('m-detail');UI.openEditHive('${hiveId}')">✎ Edit hive</button>
+        <button class="btn btn-sm" style="flex:1" onclick="UI.closeModal('m-detail');UI.openLineage('${hiveId}')">🌿 View lineage</button>
+      </div>
       <div class="fg"><label>Inspections</label><div style="color:var(--text)">${hi.length}</div></div>
-      <button class="btn btn-sm" style="margin-bottom:12px;width:auto" onclick="UI.closeModal('m-detail');UI.openEditHive('${hiveId}')">✎ Edit hive details</button>
       ${hi.slice(0,3).map(i=>this.inspCard(i,hives,false)).join('')}
       ${hi.length>3?`<p style="font-size:13px;color:var(--muted);text-align:center;margin-top:6px">+${hi.length-3} more in History</p>`:''}`;
     this.openModal('m-detail');
@@ -796,7 +1118,9 @@ ${Photos.formCard()}
 
   deleteItem(){
     if(!detailId)return;
-    if(detailType==='insp'){
+    if(detailType==='split'){
+      this.deleteSplit(); return;
+    } else if(detailType==='insp'){
       if(!confirm('Delete this inspection?'))return;
       PhotoDB.del(detailId);
       DB.setInsps(DB.insps().filter(i=>i.id!==detailId));
