@@ -133,6 +133,14 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .empty-i{font-size:36px;margin-bottom:10px}
 hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
 
+/* ── Edit button ── */
+.edit-btn{background:none;border:1px solid var(--border2);border-radius:8px;color:var(--muted);font-size:15px;padding:4px 8px;cursor:pointer;flex-shrink:0;margin-left:6px;line-height:1}
+.edit-btn:active{background:var(--surf2)}
+.qcolor-swatch{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 8px;border-radius:10px;border:2px solid transparent;transition:border-color .15s;user-select:none;-webkit-tap-highlight-color:transparent}
+.qcolor-swatch.on{border-color:var(--amber) !important;background:var(--amber-l)}
+.qcolor-dot{width:32px;height:32px;border-radius:50%;display:block;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.qcolor-lbl{font-size:11px;font-weight:500;color:var(--text);font-family:'IBM Plex Mono',monospace}
+
 /* ── Photo styles ── */
 .photo-upload-area{border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:10px;background:var(--surf2)}
 .photo-upload-area:active{border-color:var(--amber)}
@@ -170,6 +178,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
   </div>
   <div class="tabs">
     <button class="tab on" onclick="UI.tab('hives',this)">Hives</button>
+    <button class="tab" onclick="UI.tab('yards',this)">Yards</button>
     <button class="tab" onclick="UI.tab('log',this)">Log</button>
     <button class="tab" onclick="UI.tab('history',this)">History</button>
   </div>
@@ -181,6 +190,12 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     <button class="btn" onclick="UI.openAddHive()">+ Add hive</button>
   </div>
 
+  <div id="scr-yards" class="scr">
+    <div class="slbl">Your yards</div>
+    <div id="yard-list"></div>
+    <button class="btn" onclick="UI.openAddYard()">+ Add yard</button>
+  </div>
+
   <div id="scr-log" class="scr">
     <div class="slbl">Select hive to inspect</div>
     <div id="log-hives"></div>
@@ -188,22 +203,66 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
   </div>
 
   <div id="scr-history" class="scr">
-    <div class="fg"><select id="hist-filter" onchange="UI.renderHistory()"><option value="">All hives</option></select></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <select id="hist-filter-yard" onchange="UI.renderHistory()" style="flex:1"><option value="">All yards</option></select>
+      <select id="hist-filter" onchange="UI.renderHistory()" style="flex:1"><option value="">All hives</option></select>
+    </div>
     <div id="hist-list"></div>
   </div>
 </div>
 
-<button class="fab" onclick="UI.tab('log',document.querySelectorAll('.tab')[1])">+</button>
+<button class="fab" onclick="UI.tab('log',document.querySelectorAll('.tab')[2])">+</button>
 
 <!-- ADD HIVE -->
 <div class="overlay" id="m-add">
   <div class="modal">
     <div class="modal-hdr"><span class="modal-t">Add hive</span><button class="modal-x" onclick="UI.closeModal('m-add')">×</button></div>
     <div class="fg"><label>Hive name / number</label><input type="text" id="new-name" placeholder="e.g. Hive 3, South Yard #1"></div>
+    <div class="fg"><label>Yard</label><select id="new-yard"><option value="">No yard assigned</option></select></div>
     <div class="fg"><label>Location / notes</label><input type="text" id="new-loc" placeholder="e.g. Back orchard, Langstroth 10-frame"></div>
     <div class="btn-row">
       <button class="btn" onclick="UI.closeModal('m-add')">Cancel</button>
       <button class="btn btn-p" onclick="UI.saveHive()">Add hive</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT HIVE -->
+<div class="overlay" id="m-edit-hive">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-t">Edit hive</span><button class="modal-x" onclick="UI.closeModal('m-edit-hive')">×</button></div>
+    <div class="fg"><label>Hive name / number</label><input type="text" id="edit-hive-name" placeholder="e.g. Hive 3"></div>
+    <div class="fg"><label>Yard</label><select id="edit-hive-yard"><option value="">No yard assigned</option></select></div>
+    <div class="fg"><label>Location / notes</label><input type="text" id="edit-hive-loc" placeholder="e.g. Back orchard, Langstroth 10-frame"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="UI.closeModal('m-edit-hive')">Cancel</button>
+      <button class="btn btn-p" onclick="UI.saveEditHive()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD YARD -->
+<div class="overlay" id="m-add-yard">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-t">Add yard</span><button class="modal-x" onclick="UI.closeModal('m-add-yard')">×</button></div>
+    <div class="fg"><label>Yard name</label><input type="text" id="new-yard-name" placeholder="e.g. Back Yard, South Yard, Orchard"></div>
+    <div class="fg"><label>Location / notes</label><input type="text" id="new-yard-loc" placeholder="e.g. 48 hives, behind barn"></div>
+    <div class="btn-row">
+      <button class="btn" onclick="UI.closeModal('m-add-yard')">Cancel</button>
+      <button class="btn btn-p" onclick="UI.saveYard()">Add yard</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT YARD -->
+<div class="overlay" id="m-edit-yard">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-t">Edit yard</span><button class="modal-x" onclick="UI.closeModal('m-edit-yard')">×</button></div>
+    <div class="fg"><label>Yard name</label><input type="text" id="edit-yard-name" placeholder="e.g. Back Yard"></div>
+    <div class="fg"><label>Location / notes</label><input type="text" id="edit-yard-loc" placeholder="e.g. 48 hives, behind barn"></div>
+    <div class="btn-row">
+      <button class="btn btn-d btn-sm" onclick="UI.deleteYard()">Delete yard</button>
+      <button class="btn btn-p" onclick="UI.saveEditYard()" style="flex:2">Save changes</button>
     </div>
   </div>
 </div>
@@ -249,8 +308,10 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
 const DB={
   hives(){try{return JSON.parse(localStorage.getItem('bh_hives'))||[];}catch{return[];}},
   insps(){try{return JSON.parse(localStorage.getItem('bh_insps'))||[];}catch{return[];}},
+  yards(){try{return JSON.parse(localStorage.getItem('bh_yards'))||[];}catch{return[];}},
   setHives(v){localStorage.setItem('bh_hives',JSON.stringify(v));},
   setInsps(v){localStorage.setItem('bh_insps',JSON.stringify(v));},
+  setYards(v){localStorage.setItem('bh_yards',JSON.stringify(v));},
 };
 
 // ── Photo storage — kept separate to avoid hitting localStorage size limits ──
@@ -432,7 +493,7 @@ const Photos = {
 };
 
 // ── App state ─────────────────────────────────────────────────────────────────
-let activeHive=null,detailId=null,detailType=null;
+let activeHive=null,detailId=null,detailType=null,editingYardId=null,editingHiveId=null;
 
 function uid(){return '_'+Date.now()+Math.random().toString(36).slice(2,6);}
 function fmtDate(d){if(!d)return'';const p=d.split('-');return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1]-1]+' '+parseInt(p[2])+', '+p[0];}
@@ -457,6 +518,7 @@ function scoreTag(v){
   return'tag-r';
 }
 function pickPill(el,gid){qa('#'+gid+' .pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function pickColor(el){qa('#pg-qcolor .qcolor-swatch').forEach(s=>s.classList.remove('on'));el.classList.add('on');}
 function multiPill(el){el.classList.toggle('on');}
 function pickScore(el,rowId,hidId,val){
   qa('#'+rowId+' .sbtn').forEach(b=>b.classList.remove('sg','sy','sr'));
@@ -483,48 +545,167 @@ const UI={
   tab(name,btn){
     qa('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');
     qa('.scr').forEach(s=>s.classList.remove('on'));el('scr-'+name).classList.add('on');
-    if(name==='hives')this.renderHives();
-    if(name==='log')this.renderLogHives();
+    if(name==='hives')  this.renderHives();
+    if(name==='yards')  this.renderYards();
+    if(name==='log')    this.renderLogHives();
     if(name==='history')this.renderHistory();
   },
 
   renderHives(){
-    const hives=DB.hives(),insps=DB.insps();
+    const hives=DB.hives(),insps=DB.insps(),yards=DB.yards();
     const weekAgo=new Date(Date.now()-7*864e5);
     const recent=insps.filter(i=>new Date(i.date)>=weekAgo).length;
     const healthy=hives.filter(h=>hiveStatus(h.id,insps)==='g').length;
     el('stats').innerHTML=`<div class="stat"><div class="stat-n">${hives.length}</div><div class="stat-l">Hives</div></div><div class="stat"><div class="stat-n">${healthy}</div><div class="stat-l">Healthy</div></div><div class="stat"><div class="stat-n">${recent}</div><div class="stat-l">This week</div></div>`;
     const list=el('hive-list');
     if(!hives.length){list.innerHTML='<div class="empty"><div class="empty-i">🐝</div><p>No hives yet.</p></div>';return;}
-    list.innerHTML=hives.map(h=>{const st=hiveStatus(h.id,insps);const li=lastInsp(h.id,insps);return`<div class="hcard" onclick="UI.openHiveDetail('${h.id}')"><div><div class="hcard-name">${h.name}</div><div class="hcard-meta">${h.loc||''} · Last: ${li?fmtDate(li.date):'Never'}</div></div><div class="dot dot-${st}"></div></div>`;}).join('');
+    list.innerHTML=hives.map(h=>{
+      const st=hiveStatus(h.id,insps);
+      const li=lastInsp(h.id,insps);
+      const yard=yards.find(y=>y.id===h.yardId);
+      const meta=[yard?yard.name:h.loc||'',li?'Last: '+fmtDate(li.date):'Never inspected'].filter(Boolean).join(' · ');
+      return`<div class="hcard" onclick="UI.openHiveDetail('${h.id}')">
+        <div style="flex:1"><div class="hcard-name">${h.name}</div><div class="hcard-meta">${meta}</div></div>
+        <button class="edit-btn" onclick="event.stopPropagation();UI.openEditHive('${h.id}')" title="Edit hive">✎</button>
+        <div class="dot dot-${st}" style="margin-left:8px"></div>
+      </div>`;
+    }).join('');
   },
 
   openAddHive(){
     el('new-name').value='';el('new-loc').value='';
+    this.populateYardSelect('new-yard','');
     this.openModal('m-add');setTimeout(()=>el('new-name').focus(),80);
   },
 
   saveHive(){
     const name=gv('new-name');if(!name){alert('Please enter a hive name.');return;}
-    const hives=DB.hives();hives.push({id:uid(),name,loc:gv('new-loc'),created:new Date().toISOString()});
+    const hives=DB.hives();
+    hives.push({id:uid(),name,yardId:el('new-yard').value,loc:gv('new-loc'),created:new Date().toISOString()});
     DB.setHives(hives);this.closeModal('m-add');this.renderHives();this.populateSelects();
   },
 
+  openEditHive(hiveId){
+    const hive=DB.hives().find(h=>h.id===hiveId);if(!hive)return;
+    editingHiveId=hiveId;
+    el('edit-hive-name').value=hive.name||'';
+    el('edit-hive-loc').value=hive.loc||'';
+    this.populateYardSelect('edit-hive-yard',hive.yardId||'');
+    this.openModal('m-edit-hive');
+    setTimeout(()=>el('edit-hive-name').focus(),80);
+  },
+
+  saveEditHive(){
+    const name=gv('edit-hive-name');if(!name){alert('Please enter a hive name.');return;}
+    const hives=DB.hives();
+    const h=hives.find(h=>h.id===editingHiveId);if(!h)return;
+    h.name=name;h.yardId=el('edit-hive-yard').value;h.loc=gv('edit-hive-loc');
+    DB.setHives(hives);this.closeModal('m-edit-hive');editingHiveId=null;
+    this.renderHives();this.populateSelects();
+  },
+
+  // ── Yards ──────────────────────────────────────────────────────────────────
+  renderYards(){
+    const yards=DB.yards(),hives=DB.hives();
+    const list=el('yard-list');
+    if(!yards.length){
+      list.innerHTML='<div class="empty"><div class="empty-i">📍</div><p>No yards yet. Add a yard to group your hives by location.</p></div>';
+      return;
+    }
+    list.innerHTML=yards.map(y=>{
+      const count=hives.filter(h=>h.yardId===y.id).length;
+      return`<div class="hcard">
+        <div style="flex:1" onclick="UI.openEditYard('${y.id}')">
+          <div class="hcard-name">${y.name}</div>
+          <div class="hcard-meta">${y.loc||''} · ${count} hive${count!==1?'s':''}</div>
+        </div>
+        <button class="edit-btn" onclick="UI.openEditYard('${y.id}')" title="Edit yard">✎</button>
+      </div>`;
+    }).join('');
+  },
+
+  openAddYard(){
+    el('new-yard-name').value='';el('new-yard-loc').value='';
+    this.openModal('m-add-yard');setTimeout(()=>el('new-yard-name').focus(),80);
+  },
+
+  saveYard(){
+    const name=gv('new-yard-name');if(!name){alert('Please enter a yard name.');return;}
+    const yards=DB.yards();
+    yards.push({id:uid(),name,loc:gv('new-yard-loc'),created:new Date().toISOString()});
+    DB.setYards(yards);this.closeModal('m-add-yard');this.renderYards();this.populateSelects();
+  },
+
+  openEditYard(yardId){
+    const yard=DB.yards().find(y=>y.id===yardId);if(!yard)return;
+    editingYardId=yardId;
+    el('edit-yard-name').value=yard.name||'';
+    el('edit-yard-loc').value=yard.loc||'';
+    this.openModal('m-edit-yard');setTimeout(()=>el('edit-yard-name').focus(),80);
+  },
+
+  saveEditYard(){
+    const name=gv('edit-yard-name');if(!name){alert('Please enter a yard name.');return;}
+    const yards=DB.yards();
+    const y=yards.find(y=>y.id===editingYardId);if(!y)return;
+    y.name=name;y.loc=gv('edit-yard-loc');
+    DB.setYards(yards);this.closeModal('m-edit-yard');editingYardId=null;
+    this.renderYards();this.populateSelects();
+  },
+
+  deleteYard(){
+    if(!editingYardId)return;
+    const yards=DB.yards();
+    const yard=yards.find(y=>y.id===editingYardId);
+    const hiveCount=DB.hives().filter(h=>h.yardId===editingYardId).length;
+    const msg=hiveCount>0
+      ? `Delete "${yard?.name}"? The ${hiveCount} hive(s) in this yard will have their yard cleared but will NOT be deleted.`
+      : `Delete "${yard?.name}"?`;
+    if(!confirm(msg))return;
+    // Clear yardId from hives in this yard
+    const hives=DB.hives().map(h=>h.yardId===editingYardId?{...h,yardId:''}:h);
+    DB.setHives(hives);
+    DB.setYards(yards.filter(y=>y.id!==editingYardId));
+    this.closeModal('m-edit-yard');editingYardId=null;
+    this.renderYards();this.renderHives();this.populateSelects();
+  },
+
+  populateYardSelect(selectId, selectedId){
+    const yards=DB.yards();
+    const opts='<option value="">No yard assigned</option>'+
+      yards.map(y=>`<option value="${y.id}"${y.id===selectedId?' selected':''}>${y.name}</option>`).join('');
+    const e=el(selectId);if(e)e.innerHTML=opts;
+  },
+
   openHiveDetail(hiveId){
-    const hives=DB.hives(),insps=DB.insps();
+    const hives=DB.hives(),insps=DB.insps(),yards=DB.yards();
     const hive=hives.find(h=>h.id===hiveId);if(!hive)return;
     detailType='hive';detailId=hiveId;
     el('m-detail-t').textContent=hive.name;
     el('m-detail-del').textContent='Remove hive';
+    const yard=yards.find(y=>y.id===hive.yardId);
     const hi=insps.filter(i=>i.hiveId===hiveId).sort((a,b)=>new Date(b.date)-new Date(a.date));
-    el('m-detail-body').innerHTML=`<div class="fg"><label>Location</label><div style="color:var(--text)">${hive.loc||'—'}</div></div><div class="fg"><label>Inspections</label><div style="color:var(--text)">${hi.length}</div></div>${hi.slice(0,3).map(i=>this.inspCard(i,hives,false)).join('')}${hi.length>3?`<p style="font-size:13px;color:var(--muted);text-align:center;margin-top:6px">+${hi.length-3} more in History</p>`:''}`;
+    el('m-detail-body').innerHTML=`
+      <div class="fg"><label>Yard</label><div style="color:var(--text)">${yard?yard.name:'—'}</div></div>
+      <div class="fg"><label>Location</label><div style="color:var(--text)">${hive.loc||'—'}</div></div>
+      <div class="fg"><label>Inspections</label><div style="color:var(--text)">${hi.length}</div></div>
+      <button class="btn btn-sm" style="margin-bottom:12px;width:auto" onclick="UI.closeModal('m-detail');UI.openEditHive('${hiveId}')">✎ Edit hive details</button>
+      ${hi.slice(0,3).map(i=>this.inspCard(i,hives,false)).join('')}
+      ${hi.length>3?`<p style="font-size:13px;color:var(--muted);text-align:center;margin-top:6px">+${hi.length-3} more in History</p>`:''}`;
     this.openModal('m-detail');
   },
 
   renderLogHives(){
-    const hives=DB.hives();const list=el('log-hives');
+    const hives=DB.hives(),yards=DB.yards();
+    const list=el('log-hives');
     if(!hives.length){list.innerHTML='<div class="empty"><p>Add a hive first on the Hives tab.</p></div>';el('log-form').innerHTML='';return;}
-    list.innerHTML=hives.map(h=>`<div class="hcard ${activeHive===h.id?'sel':''}" onclick="UI.selectHive('${h.id}')"><div><div class="hcard-name">${h.name}</div><div class="hcard-meta">${h.loc||''}</div></div></div>`).join('');
+    list.innerHTML=hives.map(h=>{
+      const yard=yards.find(y=>y.id===h.yardId);
+      const meta=yard?yard.name:h.loc||'';
+      return`<div class="hcard ${activeHive===h.id?'sel':''}" onclick="UI.selectHive('${h.id}')">
+        <div><div class="hcard-name">${h.name}</div><div class="hcard-meta">${meta}</div></div>
+      </div>`;
+    }).join('');
     if(activeHive)this.renderForm();
   },
 
@@ -534,7 +715,7 @@ const UI={
     const today=new Date().toISOString().split('T')[0];
     el('log-form').innerHTML=`<hr class="div"><div class="slbl">Inspection details</div>
 <div class="card"><div class="card-t">Overall rating</div><div class="srow" id="sr-overall"><div class="sbtn" onclick="pickScore(this,'sr-overall','f-overall','good')">Good</div><div class="sbtn" onclick="pickScore(this,'sr-overall','f-overall','fair')">Fair</div><div class="sbtn" onclick="pickScore(this,'sr-overall','f-overall','poor')">Poor</div></div><input type="hidden" id="f-overall" value=""><div class="fg" style="margin-top:14px;margin-bottom:0"><label>Date</label><input type="date" id="f-date" value="${today}"></div></div>
-<div class="card"><div class="card-t">Queen</div><div class="fg"><label>Queen seen?</label><div class="pills" id="pg-qseen"><div class="pill" onclick="pickPill(this,'pg-qseen')">Yes</div><div class="pill" onclick="pickPill(this,'pg-qseen')">No</div><div class="pill" onclick="pickPill(this,'pg-qseen')">Eggs only</div></div></div><div class="fg"><label>Queen status</label><div class="srow" id="sr-queen"><div class="sbtn" onclick="pickScore(this,'sr-queen','f-queenscore','good')">Good</div><div class="sbtn" onclick="pickScore(this,'sr-queen','f-queenscore','fair')">Fair</div><div class="sbtn" onclick="pickScore(this,'sr-queen','f-queenscore','poor')">Poor</div></div><input type="hidden" id="f-queenscore" value=""></div><div class="fg"><label>Queen cells present?</label><div class="pills" id="pg-qcells"><div class="pill" onclick="pickPill(this,'pg-qcells');showSub('sub-qc',false)">None</div><div class="pill" onclick="pickPill(this,'pg-qcells');showSub('sub-qc',true)">Yes</div></div></div><div class="sub" id="sub-qc"><div class="fg"><label>Cell type — select all that apply</label><div class="pills" id="pg-qctype"><div class="pill pill-sm" onclick="multiPill(this)">Swarm</div><div class="pill pill-sm" onclick="multiPill(this)">Supersedure</div><div class="pill pill-sm" onclick="multiPill(this)">Emergency</div><div class="pill pill-sm" onclick="multiPill(this)">Capped</div><div class="pill pill-sm" onclick="multiPill(this)">Open</div><div class="pill pill-sm" onclick="multiPill(this)">Removed</div></div></div><div class="fg" style="margin-bottom:0"><label>Number of cells</label><input type="text" id="f-qccount" placeholder="e.g. 3"></div></div></div>
+<div class="card"><div class="card-t">Queen</div><div class="fg"><label>Queen seen?</label><div class="pills" id="pg-qseen"><div class="pill" onclick="pickPill(this,'pg-qseen')">Yes</div><div class="pill" onclick="pickPill(this,'pg-qseen')">No</div><div class="pill" onclick="pickPill(this,'pg-qseen')">Eggs only</div></div></div><div class="fg"><label>Queen marked?</label><div class="pills" id="pg-qmarked"><div class="pill" onclick="pickPill(this,'pg-qmarked')">Yes</div><div class="pill" onclick="pickPill(this,'pg-qmarked')">No</div><div class="pill" onclick="pickPill(this,'pg-qmarked')">Marked this visit</div></div></div><div class="fg"><label>Mark color <span style="font-size:11px;color:var(--muted);font-weight:400">(W=1/6 · Y=2/7 · R=3/8 · G=4/9 · B=5/0)</span></label><div class="qcolor-group" id="pg-qcolor" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:2px"><div class="qcolor-swatch" data-color="White" onclick="pickColor(this)" style="--c:#e5e7eb;--b:#9ca3af"><span class="qcolor-dot" style="background:#e5e7eb;border:2px solid #9ca3af"></span><span class="qcolor-lbl">White</span></div><div class="qcolor-swatch" data-color="Yellow" onclick="pickColor(this)" style="--c:#fef08a;--b:#ca8a04"><span class="qcolor-dot" style="background:#fef08a;border:2px solid #ca8a04"></span><span class="qcolor-lbl">Yellow</span></div><div class="qcolor-swatch" data-color="Red" onclick="pickColor(this)" style="--c:#fca5a5;--b:#dc2626"><span class="qcolor-dot" style="background:#fca5a5;border:2px solid #dc2626"></span><span class="qcolor-lbl">Red</span></div><div class="qcolor-swatch" data-color="Green" onclick="pickColor(this)" style="--c:#86efac;--b:#16a34a"><span class="qcolor-dot" style="background:#86efac;border:2px solid #16a34a"></span><span class="qcolor-lbl">Green</span></div><div class="qcolor-swatch" data-color="Blue" onclick="pickColor(this)" style="--c:#93c5fd;--b:#2563eb"><span class="qcolor-dot" style="background:#93c5fd;border:2px solid #2563eb"></span><span class="qcolor-lbl">Blue</span></div></div></div><div class="fg"><label>Queen status</label><div class="srow" id="sr-queen"><div class="sbtn" onclick="pickScore(this,'sr-queen','f-queenscore','good')">Good</div><div class="sbtn" onclick="pickScore(this,'sr-queen','f-queenscore','fair')">Fair</div><div class="sbtn" onclick="pickScore(this,'sr-queen','f-queenscore','poor')">Poor</div></div><input type="hidden" id="f-queenscore" value=""></div><div class="fg"><label>Queen cells present?</label><div class="pills" id="pg-qcells"><div class="pill" onclick="pickPill(this,'pg-qcells');showSub('sub-qc',false)">None</div><div class="pill" onclick="pickPill(this,'pg-qcells');showSub('sub-qc',true)">Yes</div></div></div><div class="sub" id="sub-qc"><div class="fg"><label>Cell type — select all that apply</label><div class="pills" id="pg-qctype"><div class="pill pill-sm" onclick="multiPill(this)">Swarm</div><div class="pill pill-sm" onclick="multiPill(this)">Supersedure</div><div class="pill pill-sm" onclick="multiPill(this)">Emergency</div><div class="pill pill-sm" onclick="multiPill(this)">Capped</div><div class="pill pill-sm" onclick="multiPill(this)">Open</div><div class="pill pill-sm" onclick="multiPill(this)">Removed</div></div></div><div class="fg" style="margin-bottom:0"><label>Number of cells</label><input type="text" id="f-qccount" placeholder="e.g. 3"></div></div></div>
 <div class="card"><div class="card-t">Brood</div><div class="fg" style="margin-bottom:0"><label>Brood pattern</label><div class="srow" id="sr-brood"><div class="sbtn" onclick="pickScore(this,'sr-brood','f-broodscore','good')">Solid</div><div class="sbtn" onclick="pickScore(this,'sr-brood','f-broodscore','fair')">Spotty</div><div class="sbtn" onclick="pickScore(this,'sr-brood','f-broodscore','poor')">Poor</div></div><input type="hidden" id="f-broodscore" value=""></div></div>
 <div class="card"><div class="card-t">Colony</div><div class="fg"><label>Population strength</label><div class="pills" id="pg-pop"><div class="pill pill-sm" onclick="pickPill(this,'pg-pop')">Light</div><div class="pill pill-sm" onclick="pickPill(this,'pg-pop')">Medium</div><div class="pill pill-sm" onclick="pickPill(this,'pg-pop')">Strong</div><div class="pill pill-sm" onclick="pickPill(this,'pg-pop')">Booming</div></div></div><div class="fg" style="margin-bottom:0"><label>Temperament</label><div class="pills" id="pg-temp"><div class="pill pill-sm" onclick="pickPill(this,'pg-temp')">Calm</div><div class="pill pill-sm" onclick="pickPill(this,'pg-temp')">Moderate</div><div class="pill pill-sm" onclick="pickPill(this,'pg-temp')">Defensive</div></div></div></div>
 <div class="card"><div class="card-t">Honey & stores</div><div class="fg" style="margin-bottom:0"><label>Store level</label><div class="srow" id="sr-honey"><div class="sbtn" onclick="pickScore(this,'sr-honey','f-honeyscore','good')">Full</div><div class="sbtn" onclick="pickScore(this,'sr-honey','f-honeyscore','fair')">Adequate</div><div class="sbtn" onclick="pickScore(this,'sr-honey','f-honeyscore','poor')">Low</div></div><input type="hidden" id="f-honeyscore" value=""></div></div>
@@ -554,7 +735,9 @@ ${Photos.formCard()}
     const sampleTxt=pillVal('pg-sample');
     const sz=sampleTxt.includes('200')?200:sampleTxt.includes('100')?100:300;
     const miteRate=mites!==''&&!isNaN(+mites)?((+mites/sz)*100).toFixed(1)+'%':'';
-    const rec={id:uid(),hiveId:activeHive,date,overall:scoreVal('f-overall'),queenSeen:pillVal('pg-qseen'),queenScore:scoreVal('f-queenscore'),queenCells:pillVal('pg-qcells'),qcType:multiPillVal('pg-qctype'),qcCount:gv('f-qccount'),broodScore:scoreVal('f-broodscore'),population:pillVal('pg-pop'),temperament:pillVal('pg-temp'),honeyScore:scoreVal('f-honeyscore'),mites,mitesSample:sampleTxt,miteRate,pestNotes:gv('f-pest'),pestScore:scoreVal('f-pestscore'),swarm:pillVal('pg-swarm'),equipChanged:gc('f-equip'),equipNotes:gv('f-equip-notes'),fed:gc('f-fed'),feedType:gv('f-feedtype'),treated:gc('f-treated'),treatment:gv('f-treatment'),notes:gv('f-notes'),savedAt:new Date().toISOString()};
+    const hiveRec=DB.hives().find(h=>h.id===activeHive)||{};
+    const yardRec=DB.yards().find(y=>y.id===hiveRec.yardId)||{};
+    const rec={id:uid(),hiveId:activeHive,yard:yardRec.name||hiveRec.loc||'',date,overall:scoreVal('f-overall'),queenSeen:pillVal('pg-qseen'),queenMarked:pillVal('pg-qmarked'),queenColor:(()=>{const s=document.querySelector('#pg-qcolor .qcolor-swatch.on');return s?s.getAttribute('data-color'):'';})(),queenScore:scoreVal('f-queenscore'),queenCells:pillVal('pg-qcells'),qcType:multiPillVal('pg-qctype'),qcCount:gv('f-qccount'),broodScore:scoreVal('f-broodscore'),population:pillVal('pg-pop'),temperament:pillVal('pg-temp'),honeyScore:scoreVal('f-honeyscore'),mites,mitesSample:sampleTxt,miteRate,pestNotes:gv('f-pest'),pestScore:scoreVal('f-pestscore'),swarm:pillVal('pg-swarm'),equipChanged:gc('f-equip'),equipNotes:gv('f-equip-notes'),fed:gc('f-fed'),feedType:gv('f-feedtype'),treated:gc('f-treated'),treatment:gv('f-treatment'),notes:gv('f-notes'),savedAt:new Date().toISOString()};
     const insps=DB.insps();insps.push(rec);DB.setInsps(insps);
     Photos.saveForInsp(rec.id);
     activeHive=null;
@@ -563,9 +746,15 @@ ${Photos.formCard()}
   },
 
   renderHistory(){
-    const hives=DB.hives(),filter=el('hist-filter').value;
+    const hives=DB.hives(),yards=DB.yards();
+    const filterHive=el('hist-filter').value;
+    const filterYard=el('hist-filter-yard').value;
     let insps=DB.insps().sort((a,b)=>new Date(b.date)-new Date(a.date));
-    if(filter)insps=insps.filter(i=>i.hiveId===filter);
+    if(filterHive) insps=insps.filter(i=>i.hiveId===filterHive);
+    else if(filterYard){
+      const yardHiveIds=hives.filter(h=>h.yardId===filterYard).map(h=>h.id);
+      insps=insps.filter(i=>yardHiveIds.includes(i.hiveId));
+    }
     const list=el('hist-list');
     if(!insps.length){list.innerHTML='<div class="empty"><div class="empty-i">📋</div><p>No inspections yet.</p></div>';return;}
     list.innerHTML=insps.map(i=>this.inspCard(i,hives,true)).join('');
@@ -577,6 +766,7 @@ ${Photos.formCard()}
     const tags=[];
     if(i.overall)tags.push({l:'Overall: '+i.overall,c:scoreTag(i.overall)});
     if(i.queenScore)tags.push({l:'Queen: '+i.queenScore,c:scoreTag(i.queenScore)});
+    if(i.queenMarked==='Marked this visit')tags.push({l:'Queen marked'+(i.queenColor?' — '+i.queenColor:''),c:'tag-b'});
     if(i.queenCells==='Yes')tags.push({l:'Queen cells'+(i.qcType?': '+i.qcType:''),c:'tag-y'});
     if(i.broodScore)tags.push({l:'Brood: '+i.broodScore,c:scoreTag(i.broodScore)});
     if(i.honeyScore)tags.push({l:'Stores: '+i.honeyScore,c:scoreTag(i.honeyScore)});
@@ -599,7 +789,7 @@ ${Photos.formCard()}
     detailType='insp';detailId=id;
     el('m-detail-t').textContent=(hive?hive.name:'?')+' · '+fmtDate(i.date);
     el('m-detail-del').textContent='Delete inspection';
-    const rows=[['Overall',i.overall||'—'],['Queen seen',i.queenSeen||'—'],['Queen status',i.queenScore||'—'],['Queen cells',i.queenCells||'—'],['Cell type',i.qcType||'—'],['Cell count',i.qcCount||'—'],['Brood pattern',i.broodScore||'—'],['Population',i.population||'—'],['Temperament',i.temperament||'—'],['Honey stores',i.honeyScore||'—'],['Varroa mites',i.mites?(i.mites+' / '+i.mitesSample):'—'],['Mite rate',i.miteRate||'—'],['Other pests',i.pestNotes||'—'],['Pest level',i.pestScore||'—'],['Swarm',i.swarm||'—'],['Equipment',i.equipChanged?('Yes'+(i.equipNotes?': '+i.equipNotes:'')):'No'],['Fed',i.fed?('Yes'+(i.feedType?': '+i.feedType:'')):'No'],['Treated',i.treated?('Yes'+(i.treatment?': '+i.treatment:'')):'No'],['Notes',i.notes||'—']];
+    const rows=[['Overall',i.overall||'—'],['Queen seen',i.queenSeen||'—'],['Queen marked',i.queenMarked||'—'],['Mark color',i.queenColor||'—'],['Queen status',i.queenScore||'—'],['Queen cells',i.queenCells||'—'],['Cell type',i.qcType||'—'],['Cell count',i.qcCount||'—'],['Brood pattern',i.broodScore||'—'],['Population',i.population||'—'],['Temperament',i.temperament||'—'],['Honey stores',i.honeyScore||'—'],['Varroa mites',i.mites?(i.mites+' / '+i.mitesSample):'—'],['Mite rate',i.miteRate||'—'],['Other pests',i.pestNotes||'—'],['Pest level',i.pestScore||'—'],['Swarm',i.swarm||'—'],['Equipment',i.equipChanged?('Yes'+(i.equipNotes?': '+i.equipNotes:'')):'No'],['Fed',i.fed?('Yes'+(i.feedType?': '+i.feedType:'')):'No'],['Treated',i.treated?('Yes'+(i.treatment?': '+i.treatment:'')):'No'],['Notes',i.notes||'—']];
     el('m-detail-body').innerHTML=`<table class="dtbl">${rows.map(([k,v])=>`<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`).join('')}</table>${Photos.renderDetailPhotos(id)}`;
     this.openModal('m-detail');
   },
@@ -628,8 +818,8 @@ ${Photos.formCard()}
     let insps=DB.insps().sort((a,b)=>new Date(a.date)-new Date(b.date));
     if(filter)insps=insps.filter(i=>i.hiveId===filter);
     if(!insps.length){alert('No inspections to export.');return;}
-    const hdrs=['Date','Hive','Overall','Queen Seen','Queen Status','Queen Cells','Cell Type','Cell Count','Brood','Population','Temperament','Honey Stores','Varroa Mites','Varroa Sample','Mite Rate','Other Pest Notes','Pest Level','Swarm','Equipment Changed','Equipment Notes','Fed','Feed Type','Treated','Treatment','Notes','Photo Count'];
-    const rows=insps.map(i=>{const hive=hives.find(h=>h.id===i.hiveId);return[i.date,hive?hive.name:i.hiveId,i.overall,i.queenSeen,i.queenScore,i.queenCells,i.qcType,i.qcCount,i.broodScore,i.population,i.temperament,i.honeyScore,i.mites,i.mitesSample,i.miteRate,i.pestNotes,i.pestScore,i.swarm,i.equipChanged?'Yes':'No',i.equipNotes,i.fed?'Yes':'No',i.feedType,i.treated?'Yes':'No',i.treatment,i.notes,PhotoDB.count(i.id)].map(v=>'"'+(v||'').toString().replace(/"/g,'""')+'"');});
+    const hdrs=['Date','Hive','Overall','Queen Seen','Queen Marked','Queen Mark Color','Queen Status','Queen Cells','Cell Type','Cell Count','Brood','Population','Temperament','Honey Stores','Varroa Mites','Varroa Sample','Mite Rate','Other Pest Notes','Pest Level','Swarm','Equipment Changed','Equipment Notes','Fed','Feed Type','Treated','Treatment','Notes','Photo Count'];
+    const rows=insps.map(i=>{const hive=hives.find(h=>h.id===i.hiveId);return[i.date,hive?hive.name:i.hiveId,i.overall,i.queenSeen,i.queenMarked,i.queenColor,i.queenScore,i.queenCells,i.qcType,i.qcCount,i.broodScore,i.population,i.temperament,i.honeyScore,i.mites,i.mitesSample,i.miteRate,i.pestNotes,i.pestScore,i.swarm,i.equipChanged?'Yes':'No',i.equipNotes,i.fed?'Yes':'No',i.feedType,i.treated?'Yes':'No',i.treatment,i.notes,PhotoDB.count(i.id)].map(v=>'"'+(v||'').toString().replace(/"/g,'""')+'"');});
     const csv=[hdrs,...rows].map(r=>r.join(',')).join('\n');
     const a=document.createElement('a');
     a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
@@ -640,8 +830,13 @@ ${Photos.formCard()}
   openModal(id){el(id).classList.add('on');},
   closeModal(id){el(id).classList.remove('on');},
   populateSelects(){
-    const opts='<option value="">All hives</option>'+DB.hives().map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
-    ['hist-filter','exp-filter'].forEach(id=>{const e=el(id);if(e)e.innerHTML=opts;});
+    const hives=DB.hives(),yards=DB.yards();
+    const hiveOpts='<option value="">All hives</option>'+hives.map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
+    const yardOpts='<option value="">All yards</option>'+yards.map(y=>`<option value="${y.id}">${y.name}</option>`).join('');
+    const expOpts='<option value="">All hives</option>'+hives.map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
+    ['hist-filter'].forEach(id=>{const e=el(id);if(e)e.innerHTML=hiveOpts;});
+    ['hist-filter-yard'].forEach(id=>{const e=el(id);if(e)e.innerHTML=yardOpts;});
+    ['exp-filter'].forEach(id=>{const e=el(id);if(e)e.innerHTML=expOpts;});
   },
 };
 
