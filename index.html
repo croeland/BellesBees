@@ -132,6 +132,34 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty-i{font-size:36px;margin-bottom:10px}
 hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
+
+/* ── Photo styles ── */
+.photo-upload-area{border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:10px;background:var(--surf2)}
+.photo-upload-area:active{border-color:var(--amber)}
+.photo-upload-icon{font-size:28px;margin-bottom:6px}
+.photo-upload-txt{font-size:13px;color:var(--muted)}
+.photo-upload-txt strong{color:var(--amber);font-weight:500}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.photo-thumb-wrap{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--surf2)}
+.photo-thumb{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
+.photo-thumb-del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.photo-thumb-lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:3px 5px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.photo-count-tag{font-size:11px;padding:3px 8px;border-radius:10px;font-family:'IBM Plex Mono',monospace;background:var(--blue-l);color:var(--blue-l);background:var(--tag-b-bg);color:var(--tag-b-txt);display:inline-block}
+
+/* Photo lightbox */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;flex-direction:column}
+.lightbox.on{display:flex}
+.lightbox-img{max-width:95vw;max-height:80vh;object-fit:contain;border-radius:8px}
+.lightbox-cap{color:#fff;font-size:13px;margin-top:12px;opacity:.75;font-family:'IBM Plex Mono',monospace}
+.lightbox-close{position:absolute;top:16px;right:20px;background:none;border:none;color:#fff;font-size:30px;cursor:pointer;opacity:.8;line-height:1}
+.lightbox-nav{display:flex;gap:16px;margin-top:14px}
+.lightbox-nav button{background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 20px;border-radius:20px;font-size:14px;cursor:pointer}
+
+/* Photo grid in detail modal */
+.detail-photo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.detail-photo-wrap{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;cursor:pointer}
+.detail-photo{width:100%;height:100%;object-fit:cover}
+.detail-photo-lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:4px 6px;font-family:'IBM Plex Mono',monospace}
 </style>
 </head>
 <body>
@@ -145,24 +173,29 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     <button class="tab" onclick="UI.tab('log',this)">Log</button>
     <button class="tab" onclick="UI.tab('history',this)">History</button>
   </div>
+
   <div id="scr-hives" class="scr on">
     <div class="stats" id="stats"></div>
     <div class="slbl">Your hives</div>
     <div id="hive-list"></div>
     <button class="btn" onclick="UI.openAddHive()">+ Add hive</button>
   </div>
+
   <div id="scr-log" class="scr">
     <div class="slbl">Select hive to inspect</div>
     <div id="log-hives"></div>
     <div id="log-form"></div>
   </div>
+
   <div id="scr-history" class="scr">
     <div class="fg"><select id="hist-filter" onchange="UI.renderHistory()"><option value="">All hives</option></select></div>
     <div id="hist-list"></div>
   </div>
 </div>
+
 <button class="fab" onclick="UI.tab('log',document.querySelectorAll('.tab')[1])">+</button>
 
+<!-- ADD HIVE -->
 <div class="overlay" id="m-add">
   <div class="modal">
     <div class="modal-hdr"><span class="modal-t">Add hive</span><button class="modal-x" onclick="UI.closeModal('m-add')">×</button></div>
@@ -175,6 +208,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
   </div>
 </div>
 
+<!-- DETAIL -->
 <div class="overlay" id="m-detail">
   <div class="modal">
     <div class="modal-hdr"><span class="modal-t" id="m-detail-t">Detail</span><button class="modal-x" onclick="UI.closeModal('m-detail')">×</button></div>
@@ -186,6 +220,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
   </div>
 </div>
 
+<!-- EXPORT -->
 <div class="overlay" id="m-export">
   <div class="modal">
     <div class="modal-hdr"><span class="modal-t">Export CSV</span><button class="modal-x" onclick="UI.closeModal('m-export')">×</button></div>
@@ -198,14 +233,207 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
   </div>
 </div>
 
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="Photos.closeLightbox()">
+  <button class="lightbox-close" onclick="Photos.closeLightbox()">×</button>
+  <img class="lightbox-img" id="lb-img" src="" alt="">
+  <div class="lightbox-cap" id="lb-cap"></div>
+  <div class="lightbox-nav" onclick="event.stopPropagation()">
+    <button onclick="Photos.lbNav(-1)">← Prev</button>
+    <button onclick="Photos.lbNav(1)">Next →</button>
+  </div>
+</div>
+
 <script>
+// ── Storage ───────────────────────────────────────────────────────────────────
 const DB={
   hives(){try{return JSON.parse(localStorage.getItem('bh_hives'))||[];}catch{return[];}},
   insps(){try{return JSON.parse(localStorage.getItem('bh_insps'))||[];}catch{return[];}},
   setHives(v){localStorage.setItem('bh_hives',JSON.stringify(v));},
   setInsps(v){localStorage.setItem('bh_insps',JSON.stringify(v));},
 };
+
+// ── Photo storage — kept separate to avoid hitting localStorage size limits ──
+// Photos stored as: bh_photos_{inspId} = [{id, label, dataUrl}]
+const PhotoDB={
+  get(inspId){try{return JSON.parse(localStorage.getItem('bh_photos_'+inspId))||[];}catch{return[];}},
+  set(inspId,arr){
+    try{localStorage.setItem('bh_photos_'+inspId,JSON.stringify(arr));}
+    catch(e){
+      if(e.name==='QuotaExceededError'){
+        alert('Storage full — photo not saved. Try taking fewer or smaller photos.');
+      }
+    }
+  },
+  del(inspId){localStorage.removeItem('bh_photos_'+inspId);},
+  count(inspId){return this.get(inspId).length;},
+};
+
+// ── Photo labels ──────────────────────────────────────────────────────────────
+const PHOTO_LABELS = ['Queen','Brood pattern','Queen cells','Varroa wash','Honey stores','Equipment','Other'];
+
+// ── In-memory staging for current inspection form ─────────────────────────────
+let stagedPhotos = []; // [{id, label, dataUrl}]
+
+// ── Photo module ──────────────────────────────────────────────────────────────
+const Photos = {
+  lbPhotos: [],
+  lbIdx: 0,
+
+  // Compress image to reasonable size for localStorage
+  compress(file, cb) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1000;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  },
+
+  // Called when user picks files in the form
+  handleFiles(files) {
+    Array.from(files).forEach(file => {
+      if (!file.type.startsWith('image/')) return;
+      this.compress(file, dataUrl => {
+        const photo = { id: '_p' + Date.now() + Math.random().toString(36).slice(2,5), label: 'Other', dataUrl };
+        stagedPhotos.push(photo);
+        this.renderStagedGrid();
+      });
+    });
+  },
+
+  // Render the photo grid inside the inspection form
+  renderStagedGrid() {
+    const grid = document.getElementById('staged-photo-grid');
+    if (!grid) return;
+    if (!stagedPhotos.length) {
+      grid.innerHTML = '';
+      return;
+    }
+    grid.innerHTML = stagedPhotos.map((p, i) => `
+      <div class="photo-thumb-wrap">
+        <img class="photo-thumb" src="${p.dataUrl}" onclick="Photos.openLightboxFromStaged(${i})">
+        <button class="photo-thumb-del" onclick="Photos.deleteStagedPhoto('${p.id}')">×</button>
+        <div class="photo-thumb-lbl">${p.label}</div>
+      </div>
+    `).join('');
+    // Update label selects below
+    this.renderLabelSelects();
+  },
+
+  // Render label selectors under the grid
+  renderLabelSelects() {
+    const wrap = document.getElementById('staged-label-wrap');
+    if (!wrap || !stagedPhotos.length) { if (wrap) wrap.innerHTML = ''; return; }
+    wrap.innerHTML = stagedPhotos.map((p, i) => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <img src="${p.dataUrl}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0">
+        <select onchange="Photos.setLabel('${p.id}',this.value)" style="flex:1;font-size:13px;padding:7px 10px">
+          ${PHOTO_LABELS.map(l => `<option value="${l}" ${l===p.label?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+    `).join('');
+  },
+
+  setLabel(id, label) {
+    const p = stagedPhotos.find(x => x.id === id);
+    if (p) { p.label = label; this.renderStagedGrid(); }
+  },
+
+  deleteStagedPhoto(id) {
+    stagedPhotos = stagedPhotos.filter(p => p.id !== id);
+    this.renderStagedGrid();
+    this.renderLabelSelects();
+  },
+
+  // Save staged photos to storage under an inspId
+  saveForInsp(inspId) {
+    if (stagedPhotos.length) PhotoDB.set(inspId, stagedPhotos);
+    stagedPhotos = [];
+  },
+
+  // Lightbox from staged grid
+  openLightboxFromStaged(idx) {
+    this.lbPhotos = stagedPhotos;
+    this.lbIdx = idx;
+    this.showLightbox();
+  },
+
+  // Lightbox from detail view
+  openLightbox(photos, idx) {
+    this.lbPhotos = photos;
+    this.lbIdx = idx;
+    this.showLightbox();
+  },
+
+  showLightbox() {
+    const p = this.lbPhotos[this.lbIdx];
+    if (!p) return;
+    document.getElementById('lb-img').src = p.dataUrl;
+    document.getElementById('lb-cap').textContent = p.label + (this.lbPhotos.length > 1 ? ` (${this.lbIdx+1}/${this.lbPhotos.length})` : '');
+    document.getElementById('lightbox').classList.add('on');
+  },
+
+  closeLightbox() {
+    document.getElementById('lightbox').classList.remove('on');
+    document.getElementById('lb-img').src = '';
+  },
+
+  lbNav(dir) {
+    this.lbIdx = (this.lbIdx + dir + this.lbPhotos.length) % this.lbPhotos.length;
+    this.showLightbox();
+  },
+
+  // Render photos in the detail modal
+  renderDetailPhotos(inspId) {
+    const photos = PhotoDB.get(inspId);
+    if (!photos.length) return '';
+    return `
+      <div style="margin-top:14px">
+        <div style="font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;text-transform:uppercase;font-size:11px">Photos (${photos.length})</div>
+        <div class="detail-photo-grid">
+          ${photos.map((p,i) => `
+            <div class="detail-photo-wrap" onclick="Photos.openLightbox(${JSON.stringify(photos).replace(/"/g,'&quot;')},${i})">
+              <img class="detail-photo" src="${p.dataUrl}">
+              <div class="detail-photo-lbl">${p.label}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  },
+
+  // Photo card HTML for inside the inspection form
+  formCard() {
+    return `
+    <div class="card">
+      <div class="card-t">Photos</div>
+      <div class="photo-upload-area" onclick="document.getElementById('photo-input').click()">
+        <div class="photo-upload-icon">📷</div>
+        <div class="photo-upload-txt">Tap to add photos<br><strong>Queen · Brood · Anything interesting</strong></div>
+      </div>
+      <input type="file" id="photo-input" accept="image/*" multiple capture="environment"
+        style="display:none" onchange="Photos.handleFiles(this.files);this.value=''">
+      <div id="staged-photo-grid" class="photo-grid"></div>
+      <div id="staged-label-wrap" style="margin-top:10px"></div>
+    </div>`;
+  },
+};
+
+// ── App state ─────────────────────────────────────────────────────────────────
 let activeHive=null,detailId=null,detailType=null;
+
 function uid(){return '_'+Date.now()+Math.random().toString(36).slice(2,6);}
 function fmtDate(d){if(!d)return'';const p=d.split('-');return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1]-1]+' '+parseInt(p[2])+', '+p[0];}
 function el(id){return document.getElementById(id);}
@@ -250,6 +478,7 @@ function calcMites(){
   else if(rate<3){lbl.textContent='Borderline';lbl.className='mbox-lbl tag tag-y';}
   else{lbl.textContent='Treat now';lbl.className='mbox-lbl tag tag-r';}
 }
+
 const UI={
   tab(name,btn){
     qa('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');
@@ -258,6 +487,7 @@ const UI={
     if(name==='log')this.renderLogHives();
     if(name==='history')this.renderHistory();
   },
+
   renderHives(){
     const hives=DB.hives(),insps=DB.insps();
     const weekAgo=new Date(Date.now()-7*864e5);
@@ -268,15 +498,18 @@ const UI={
     if(!hives.length){list.innerHTML='<div class="empty"><div class="empty-i">🐝</div><p>No hives yet.</p></div>';return;}
     list.innerHTML=hives.map(h=>{const st=hiveStatus(h.id,insps);const li=lastInsp(h.id,insps);return`<div class="hcard" onclick="UI.openHiveDetail('${h.id}')"><div><div class="hcard-name">${h.name}</div><div class="hcard-meta">${h.loc||''} · Last: ${li?fmtDate(li.date):'Never'}</div></div><div class="dot dot-${st}"></div></div>`;}).join('');
   },
+
   openAddHive(){
     el('new-name').value='';el('new-loc').value='';
     this.openModal('m-add');setTimeout(()=>el('new-name').focus(),80);
   },
+
   saveHive(){
     const name=gv('new-name');if(!name){alert('Please enter a hive name.');return;}
     const hives=DB.hives();hives.push({id:uid(),name,loc:gv('new-loc'),created:new Date().toISOString()});
     DB.setHives(hives);this.closeModal('m-add');this.renderHives();this.populateSelects();
   },
+
   openHiveDetail(hiveId){
     const hives=DB.hives(),insps=DB.insps();
     const hive=hives.find(h=>h.id===hiveId);if(!hive)return;
@@ -287,13 +520,16 @@ const UI={
     el('m-detail-body').innerHTML=`<div class="fg"><label>Location</label><div style="color:var(--text)">${hive.loc||'—'}</div></div><div class="fg"><label>Inspections</label><div style="color:var(--text)">${hi.length}</div></div>${hi.slice(0,3).map(i=>this.inspCard(i,hives,false)).join('')}${hi.length>3?`<p style="font-size:13px;color:var(--muted);text-align:center;margin-top:6px">+${hi.length-3} more in History</p>`:''}`;
     this.openModal('m-detail');
   },
+
   renderLogHives(){
     const hives=DB.hives();const list=el('log-hives');
     if(!hives.length){list.innerHTML='<div class="empty"><p>Add a hive first on the Hives tab.</p></div>';el('log-form').innerHTML='';return;}
     list.innerHTML=hives.map(h=>`<div class="hcard ${activeHive===h.id?'sel':''}" onclick="UI.selectHive('${h.id}')"><div><div class="hcard-name">${h.name}</div><div class="hcard-meta">${h.loc||''}</div></div></div>`).join('');
     if(activeHive)this.renderForm();
   },
-  selectHive(id){activeHive=id;this.renderLogHives();},
+
+  selectHive(id){stagedPhotos=[];activeHive=id;this.renderLogHives();},
+
   renderForm(){
     const today=new Date().toISOString().split('T')[0];
     el('log-form').innerHTML=`<hr class="div"><div class="slbl">Inspection details</div>
@@ -308,8 +544,10 @@ const UI={
 <div class="card"><div class="card-t">Feeding</div><div class="trow"><span class="trow-lbl">Fed this visit?</span><label class="tog"><input type="checkbox" id="f-fed"><span class="tog-tr"></span></label></div><div class="fg" style="margin-top:12px;margin-bottom:0"><label>Feed type / amount</label><input type="text" id="f-feedtype" placeholder="e.g. 1:1 syrup 1 qt · pollen patty"></div></div>
 <div class="card"><div class="card-t">Treatment</div><div class="trow"><span class="trow-lbl">Treated this visit?</span><label class="tog"><input type="checkbox" id="f-treated"><span class="tog-tr"></span></label></div><div class="fg" style="margin-top:12px;margin-bottom:0"><label>Treatment used</label><input type="text" id="f-treatment" placeholder="e.g. Apivar strips, OA dribble, HopGuard"></div></div>
 <div class="card"><div class="fg" style="margin-bottom:0"><label>Notes</label><textarea id="f-notes" placeholder="Follow-up needed, observations, concerns…"></textarea></div></div>
+${Photos.formCard()}
 <button class="btn btn-p" style="margin-top:4px" onclick="UI.saveInsp()">Save inspection</button><div style="height:20px"></div>`;
   },
+
   saveInsp(){
     const date=gv('f-date');if(!date){alert('Please select a date.');return;}
     const mites=el('f-mites')?el('f-mites').value.trim():'';
@@ -318,10 +556,12 @@ const UI={
     const miteRate=mites!==''&&!isNaN(+mites)?((+mites/sz)*100).toFixed(1)+'%':'';
     const rec={id:uid(),hiveId:activeHive,date,overall:scoreVal('f-overall'),queenSeen:pillVal('pg-qseen'),queenScore:scoreVal('f-queenscore'),queenCells:pillVal('pg-qcells'),qcType:multiPillVal('pg-qctype'),qcCount:gv('f-qccount'),broodScore:scoreVal('f-broodscore'),population:pillVal('pg-pop'),temperament:pillVal('pg-temp'),honeyScore:scoreVal('f-honeyscore'),mites,mitesSample:sampleTxt,miteRate,pestNotes:gv('f-pest'),pestScore:scoreVal('f-pestscore'),swarm:pillVal('pg-swarm'),equipChanged:gc('f-equip'),equipNotes:gv('f-equip-notes'),fed:gc('f-fed'),feedType:gv('f-feedtype'),treated:gc('f-treated'),treatment:gv('f-treatment'),notes:gv('f-notes'),savedAt:new Date().toISOString()};
     const insps=DB.insps();insps.push(rec);DB.setInsps(insps);
+    Photos.saveForInsp(rec.id);
     activeHive=null;
     el('log-form').innerHTML=`<div style="text-align:center;padding:40px 0;color:var(--text)"><div style="font-size:40px">✓</div><p style="font-weight:500;margin-top:10px">Inspection saved!</p></div>`;
     this.renderLogHives();setTimeout(()=>{el('log-form').innerHTML='';this.renderLogHives();},2000);
   },
+
   renderHistory(){
     const hives=DB.hives(),filter=el('hist-filter').value;
     let insps=DB.insps().sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -330,8 +570,10 @@ const UI={
     if(!insps.length){list.innerHTML='<div class="empty"><div class="empty-i">📋</div><p>No inspections yet.</p></div>';return;}
     list.innerHTML=insps.map(i=>this.inspCard(i,hives,true)).join('');
   },
+
   inspCard(i,hives,clickable){
     const hive=hives.find(h=>h.id===i.hiveId);
+    const photoCount=PhotoDB.count(i.id);
     const tags=[];
     if(i.overall)tags.push({l:'Overall: '+i.overall,c:scoreTag(i.overall)});
     if(i.queenScore)tags.push({l:'Queen: '+i.queenScore,c:scoreTag(i.queenScore)});
@@ -345,9 +587,11 @@ const UI={
     if(i.fed)tags.push({l:'Fed',c:'tag-x'});
     if(i.treated)tags.push({l:'Treated',c:'tag-b'});
     if(i.equipChanged)tags.push({l:'Equipment',c:'tag-x'});
+    if(photoCount>0)tags.push({l:'📷 '+photoCount+' photo'+(photoCount>1?'s':''),c:'tag-b'});
     const click=clickable?`onclick="UI.openInspDetail('${i.id}')"` :'';
     return`<div class="iitem" ${click}><div class="iitem-hdr"><div class="iitem-hive">${hive?hive.name:'Unknown'}</div><div class="iitem-date">${fmtDate(i.date)}</div></div>${i.notes?`<div class="iitem-note">${i.notes}</div>`:''}<div class="tags">${tags.map(t=>`<span class="tag ${t.c}">${t.l}</span>`).join('')}</div></div>`;
   },
+
   openInspDetail(id){
     const insps=DB.insps(),hives=DB.hives();
     const i=insps.find(x=>x.id===id);if(!i)return;
@@ -356,37 +600,43 @@ const UI={
     el('m-detail-t').textContent=(hive?hive.name:'?')+' · '+fmtDate(i.date);
     el('m-detail-del').textContent='Delete inspection';
     const rows=[['Overall',i.overall||'—'],['Queen seen',i.queenSeen||'—'],['Queen status',i.queenScore||'—'],['Queen cells',i.queenCells||'—'],['Cell type',i.qcType||'—'],['Cell count',i.qcCount||'—'],['Brood pattern',i.broodScore||'—'],['Population',i.population||'—'],['Temperament',i.temperament||'—'],['Honey stores',i.honeyScore||'—'],['Varroa mites',i.mites?(i.mites+' / '+i.mitesSample):'—'],['Mite rate',i.miteRate||'—'],['Other pests',i.pestNotes||'—'],['Pest level',i.pestScore||'—'],['Swarm',i.swarm||'—'],['Equipment',i.equipChanged?('Yes'+(i.equipNotes?': '+i.equipNotes:'')):'No'],['Fed',i.fed?('Yes'+(i.feedType?': '+i.feedType:'')):'No'],['Treated',i.treated?('Yes'+(i.treatment?': '+i.treatment:'')):'No'],['Notes',i.notes||'—']];
-    el('m-detail-body').innerHTML=`<table class="dtbl">${rows.map(([k,v])=>`<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`).join('')}</table>`;
+    el('m-detail-body').innerHTML=`<table class="dtbl">${rows.map(([k,v])=>`<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`).join('')}</table>${Photos.renderDetailPhotos(id)}`;
     this.openModal('m-detail');
   },
+
   deleteItem(){
     if(!detailId)return;
     if(detailType==='insp'){
       if(!confirm('Delete this inspection?'))return;
+      PhotoDB.del(detailId);
       DB.setInsps(DB.insps().filter(i=>i.id!==detailId));
       this.closeModal('m-detail');this.renderHistory();this.renderHives();
     }else{
       if(!confirm('Remove this hive and ALL its inspections?'))return;
+      DB.insps().filter(i=>i.hiveId===detailId).forEach(i=>PhotoDB.del(i.id));
       DB.setHives(DB.hives().filter(h=>h.id!==detailId));
       DB.setInsps(DB.insps().filter(i=>i.hiveId!==detailId));
       this.closeModal('m-detail');this.renderHives();this.populateSelects();
     }
     detailId=null;detailType=null;
   },
+
   showExport(){this.populateSelects();this.openModal('m-export');},
+
   doExport(){
     const hives=DB.hives(),filter=el('exp-filter').value;
     let insps=DB.insps().sort((a,b)=>new Date(a.date)-new Date(b.date));
     if(filter)insps=insps.filter(i=>i.hiveId===filter);
     if(!insps.length){alert('No inspections to export.');return;}
-    const hdrs=['Date','Hive','Overall','Queen Seen','Queen Status','Queen Cells','Cell Type','Cell Count','Brood','Population','Temperament','Honey Stores','Varroa Mites','Varroa Sample','Mite Rate','Other Pest Notes','Pest Level','Swarm','Equipment Changed','Equipment Notes','Fed','Feed Type','Treated','Treatment','Notes'];
-    const rows=insps.map(i=>{const hive=hives.find(h=>h.id===i.hiveId);return[i.date,hive?hive.name:i.hiveId,i.overall,i.queenSeen,i.queenScore,i.queenCells,i.qcType,i.qcCount,i.broodScore,i.population,i.temperament,i.honeyScore,i.mites,i.mitesSample,i.miteRate,i.pestNotes,i.pestScore,i.swarm,i.equipChanged?'Yes':'No',i.equipNotes,i.fed?'Yes':'No',i.feedType,i.treated?'Yes':'No',i.treatment,i.notes].map(v=>'"'+(v||'').toString().replace(/"/g,'""')+'"');});
+    const hdrs=['Date','Hive','Overall','Queen Seen','Queen Status','Queen Cells','Cell Type','Cell Count','Brood','Population','Temperament','Honey Stores','Varroa Mites','Varroa Sample','Mite Rate','Other Pest Notes','Pest Level','Swarm','Equipment Changed','Equipment Notes','Fed','Feed Type','Treated','Treatment','Notes','Photo Count'];
+    const rows=insps.map(i=>{const hive=hives.find(h=>h.id===i.hiveId);return[i.date,hive?hive.name:i.hiveId,i.overall,i.queenSeen,i.queenScore,i.queenCells,i.qcType,i.qcCount,i.broodScore,i.population,i.temperament,i.honeyScore,i.mites,i.mitesSample,i.miteRate,i.pestNotes,i.pestScore,i.swarm,i.equipChanged?'Yes':'No',i.equipNotes,i.fed?'Yes':'No',i.feedType,i.treated?'Yes':'No',i.treatment,i.notes,PhotoDB.count(i.id)].map(v=>'"'+(v||'').toString().replace(/"/g,'""')+'"');});
     const csv=[hdrs,...rows].map(r=>r.join(',')).join('\n');
     const a=document.createElement('a');
     a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
     a.download='belles-honey-inspections.csv';a.click();
     this.closeModal('m-export');
   },
+
   openModal(id){el(id).classList.add('on');},
   closeModal(id){el(id).classList.remove('on');},
   populateSelects(){
@@ -394,6 +644,7 @@ const UI={
     ['hist-filter','exp-filter'].forEach(id=>{const e=el(id);if(e)e.innerHTML=opts;});
   },
 };
+
 UI.renderHives();
 UI.populateSelects();
 </script>
