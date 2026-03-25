@@ -132,11 +132,11 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .empty{text-align:center;padding:40px 20px;color:var(--muted)}
 .empty-i{font-size:36px;margin-bottom:10px}
 hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
- 
+
 /* ── Edit button ── */
 .edit-btn{background:none;border:1px solid var(--border2);border-radius:8px;color:var(--muted);font-size:15px;padding:4px 8px;cursor:pointer;flex-shrink:0;margin-left:6px;line-height:1}
 .edit-btn:active{background:var(--surf2)}
- 
+
 /* ── Splits ── */
 .split-item{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;cursor:pointer}
 .split-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
@@ -144,7 +144,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
 .split-date{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
 .split-meta{font-size:13px;color:var(--muted);margin-top:2px}
 .split-source-badge{display:inline-block;font-size:11px;padding:3px 8px;border-radius:10px;font-family:'IBM Plex Mono',monospace;margin-top:5px;background:var(--blue-l);color:var(--blue)}
- 
+
 /* ── Lineage tree ── */
 .lineage-node{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surf);margin-bottom:6px;position:relative}
 .lineage-node.current{border-color:var(--amber);background:var(--amber-l)}
@@ -158,7 +158,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
 .qcolor-swatch.on{border-color:var(--amber) !important;background:var(--amber-l)}
 .qcolor-dot{width:32px;height:32px;border-radius:50%;display:block;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .qcolor-lbl{font-size:11px;font-weight:500;color:var(--text);font-family:'IBM Plex Mono',monospace}
- 
+
 /* ── Photo styles ── */
 .photo-upload-area{border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:10px;background:var(--surf2)}
 .photo-upload-area:active{border-color:var(--amber)}
@@ -171,7 +171,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
 .photo-thumb-del{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .photo-thumb-lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:3px 5px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .photo-count-tag{font-size:11px;padding:3px 8px;border-radius:10px;font-family:'IBM Plex Mono',monospace;background:var(--blue-l);color:var(--blue-l);background:var(--tag-b-bg);color:var(--tag-b-txt);display:inline-block}
- 
+
 /* Photo lightbox */
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;flex-direction:column}
 .lightbox.on{display:flex}
@@ -180,7 +180,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
 .lightbox-close{position:absolute;top:16px;right:20px;background:none;border:none;color:#fff;font-size:30px;cursor:pointer;opacity:.8;line-height:1}
 .lightbox-nav{display:flex;gap:16px;margin-top:14px}
 .lightbox-nav button{background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 20px;border-radius:20px;font-size:14px;cursor:pointer}
- 
+
 /* Photo grid in detail modal */
 .detail-photo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
 .detail-photo-wrap{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden;cursor:pointer}
@@ -204,20 +204,20 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     <button class="tab" onclick="UI.tab('splits',this)">Splits</button>
     <button class="tab" onclick="UI.tab('history',this)">History</button>
   </div>
- 
+
   <div id="scr-hives" class="scr on">
     <div class="stats" id="stats"></div>
     <div class="slbl">Your hives</div>
     <div id="hive-list"></div>
     <button class="btn" onclick="UI.openAddHive()">+ Add hive</button>
   </div>
- 
+
   <div id="scr-yards" class="scr">
     <div class="slbl">Your yards</div>
     <div id="yard-list"></div>
     <button class="btn" onclick="UI.openAddYard()">+ Add yard</button>
   </div>
- 
+
   <div id="scr-splits" class="scr">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div class="slbl" style="margin:0">Split log</div>
@@ -225,13 +225,13 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     </div>
     <div id="split-list"></div>
   </div>
- 
+
   <div id="scr-log" class="scr">
     <div class="slbl">Select hive to inspect</div>
     <div id="log-hives"></div>
     <div id="log-form"></div>
   </div>
- 
+
   <div id="scr-history" class="scr">
     <div style="display:flex;gap:8px;margin-bottom:12px">
       <select id="hist-filter-yard" onchange="UI.renderHistory()" style="flex:1"><option value="">All yards</option></select>
@@ -240,9 +240,9 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     <div id="hist-list"></div>
   </div>
 </div>
- 
+
 <button class="fab" onclick="UI.tab('log',document.querySelectorAll('.tab')[2])">+</button>
- 
+
 <!-- ADD HIVE -->
 <div class="overlay" id="m-add">
   <div class="modal">
@@ -256,7 +256,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     </div>
   </div>
 </div>
- 
+
 <!-- EDIT HIVE -->
 <div class="overlay" id="m-edit-hive">
   <div class="modal">
@@ -270,7 +270,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     </div>
   </div>
 </div>
- 
+
 <!-- ADD YARD -->
 <div class="overlay" id="m-add-yard">
   <div class="modal">
@@ -283,7 +283,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     </div>
   </div>
 </div>
- 
+
 <!-- EDIT YARD -->
 <div class="overlay" id="m-edit-yard">
   <div class="modal">
@@ -296,7 +296,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     </div>
   </div>
 </div>
- 
+
 <!-- LOG SPLIT -->
 <div class="overlay" id="m-add-split">
   <div class="modal">
@@ -352,7 +352,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     </div>
   </div>
 </div>
- 
+
 <!-- SPLIT DETAIL -->
 <div class="overlay" id="m-split-detail">
   <div class="modal">
@@ -364,7 +364,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     </div>
   </div>
 </div>
- 
+
 <!-- LINEAGE TREE -->
 <div class="overlay" id="m-lineage">
   <div class="modal">
@@ -375,7 +375,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     </div>
   </div>
 </div>
- 
+
 <!-- DETAIL -->
 <div class="overlay" id="m-detail">
   <div class="modal">
@@ -387,7 +387,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     </div>
   </div>
 </div>
- 
+
 <!-- EXPORT -->
 <div class="overlay" id="m-export">
   <div class="modal">
@@ -400,7 +400,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     </div>
   </div>
 </div>
- 
+
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="Photos.closeLightbox()">
   <button class="lightbox-close" onclick="Photos.closeLightbox()">×</button>
@@ -411,7 +411,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
     <button onclick="Photos.lbNav(1)">Next →</button>
   </div>
 </div>
- 
+
 <script>
 // ── Storage ───────────────────────────────────────────────────────────────────
 const DB={
@@ -424,7 +424,7 @@ const DB={
   setYards(v){localStorage.setItem('bh_yards',JSON.stringify(v));},
   setSplits(v){localStorage.setItem('bh_splits',JSON.stringify(v));},
 };
- 
+
 // ── Photo storage — kept separate to avoid hitting localStorage size limits ──
 // Photos stored as: bh_photos_{inspId} = [{id, label, dataUrl}]
 const PhotoDB={
@@ -440,18 +440,18 @@ const PhotoDB={
   del(inspId){localStorage.removeItem('bh_photos_'+inspId);},
   count(inspId){return this.get(inspId).length;},
 };
- 
+
 // ── Photo labels ──────────────────────────────────────────────────────────────
 const PHOTO_LABELS = ['Queen','Brood pattern','Queen cells','Varroa wash','Honey stores','Equipment','Other'];
- 
+
 // ── In-memory staging for current inspection form ─────────────────────────────
 let stagedPhotos = []; // [{id, label, dataUrl}]
- 
+
 // ── Photo module ──────────────────────────────────────────────────────────────
 const Photos = {
   lbPhotos: [],
   lbIdx: 0,
- 
+
   // Compress image to reasonable size for localStorage
   compress(file, cb) {
     const reader = new FileReader();
@@ -473,7 +473,7 @@ const Photos = {
     };
     reader.readAsDataURL(file);
   },
- 
+
   // Called when user picks files in the form
   handleFiles(files) {
     Array.from(files).forEach(file => {
@@ -485,7 +485,7 @@ const Photos = {
       });
     });
   },
- 
+
   // Render the photo grid inside the inspection form
   renderStagedGrid() {
     const grid = document.getElementById('staged-photo-grid');
@@ -504,7 +504,7 @@ const Photos = {
     // Update label selects below
     this.renderLabelSelects();
   },
- 
+
   // Render label selectors under the grid
   renderLabelSelects() {
     const wrap = document.getElementById('staged-label-wrap');
@@ -518,38 +518,38 @@ const Photos = {
       </div>
     `).join('');
   },
- 
+
   setLabel(id, label) {
     const p = stagedPhotos.find(x => x.id === id);
     if (p) { p.label = label; this.renderStagedGrid(); }
   },
- 
+
   deleteStagedPhoto(id) {
     stagedPhotos = stagedPhotos.filter(p => p.id !== id);
     this.renderStagedGrid();
     this.renderLabelSelects();
   },
- 
+
   // Save staged photos to storage under an inspId
   saveForInsp(inspId) {
     if (stagedPhotos.length) PhotoDB.set(inspId, stagedPhotos);
     stagedPhotos = [];
   },
- 
+
   // Lightbox from staged grid
   openLightboxFromStaged(idx) {
     this.lbPhotos = stagedPhotos;
     this.lbIdx = idx;
     this.showLightbox();
   },
- 
+
   // Lightbox from detail view
   openLightbox(photos, idx) {
     this.lbPhotos = photos;
     this.lbIdx = idx;
     this.showLightbox();
   },
- 
+
   showLightbox() {
     const p = this.lbPhotos[this.lbIdx];
     if (!p) return;
@@ -557,17 +557,17 @@ const Photos = {
     document.getElementById('lb-cap').textContent = p.label + (this.lbPhotos.length > 1 ? ` (${this.lbIdx+1}/${this.lbPhotos.length})` : '');
     document.getElementById('lightbox').classList.add('on');
   },
- 
+
   closeLightbox() {
     document.getElementById('lightbox').classList.remove('on');
     document.getElementById('lb-img').src = '';
   },
- 
+
   lbNav(dir) {
     this.lbIdx = (this.lbIdx + dir + this.lbPhotos.length) % this.lbPhotos.length;
     this.showLightbox();
   },
- 
+
   // Render photos in the detail modal
   renderDetailPhotos(inspId) {
     const photos = PhotoDB.get(inspId);
@@ -585,7 +585,7 @@ const Photos = {
         </div>
       </div>`;
   },
- 
+
   // Photo card HTML for inside the inspection form
   formCard() {
     return `
@@ -602,10 +602,10 @@ const Photos = {
     </div>`;
   },
 };
- 
+
 // ── App state ─────────────────────────────────────────────────────────────────
 let activeHive=null,detailId=null,detailType=null,editingYardId=null,editingHiveId=null;
- 
+
 function uid(){return '_'+Date.now()+Math.random().toString(36).slice(2,6);}
 function fmtDate(d){if(!d)return'';const p=d.split('-');return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1]-1]+' '+parseInt(p[2])+', '+p[0];}
 function el(id){return document.getElementById(id);}
@@ -678,7 +678,7 @@ function calcMites(){
   else if(rate<3){lbl.textContent='Borderline';lbl.className='mbox-lbl tag tag-y';}
   else{lbl.textContent='Treat now';lbl.className='mbox-lbl tag tag-r';}
 }
- 
+
 const UI={
   tab(name,btn){
     qa('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');
@@ -689,7 +689,7 @@ const UI={
     if(name==='splits') this.renderSplits();
     if(name==='history')this.renderHistory();
   },
- 
+
   renderHives(){
     const hives=DB.hives(),insps=DB.insps(),yards=DB.yards();
     const weekAgo=new Date(Date.now()-7*864e5);
@@ -710,20 +710,20 @@ const UI={
       </div>`;
     }).join('');
   },
- 
+
   openAddHive(){
     el('new-name').value='';el('new-loc').value='';
     this.populateYardSelect('new-yard','');
     this.openModal('m-add');setTimeout(()=>el('new-name').focus(),80);
   },
- 
+
   saveHive(){
     const name=gv('new-name');if(!name){alert('Please enter a hive name.');return;}
     const hives=DB.hives();
     hives.push({id:uid(),name,yardId:el('new-yard').value,loc:gv('new-loc'),created:new Date().toISOString()});
     DB.setHives(hives);this.closeModal('m-add');this.renderHives();this.populateSelects();
   },
- 
+
   openEditHive(hiveId){
     const hive=DB.hives().find(h=>h.id===hiveId);if(!hive)return;
     editingHiveId=hiveId;
@@ -733,7 +733,7 @@ const UI={
     this.openModal('m-edit-hive');
     setTimeout(()=>el('edit-hive-name').focus(),80);
   },
- 
+
   saveEditHive(){
     const name=gv('edit-hive-name');if(!name){alert('Please enter a hive name.');return;}
     const hives=DB.hives();
@@ -742,7 +742,7 @@ const UI={
     DB.setHives(hives);this.closeModal('m-edit-hive');editingHiveId=null;
     this.renderHives();this.populateSelects();
   },
- 
+
   // ── Yards ──────────────────────────────────────────────────────────────────
   renderYards(){
     const yards=DB.yards(),hives=DB.hives();
@@ -762,19 +762,19 @@ const UI={
       </div>`;
     }).join('');
   },
- 
+
   openAddYard(){
     el('new-yard-name').value='';el('new-yard-loc').value='';
     this.openModal('m-add-yard');setTimeout(()=>el('new-yard-name').focus(),80);
   },
- 
+
   saveYard(){
     const name=gv('new-yard-name');if(!name){alert('Please enter a yard name.');return;}
     const yards=DB.yards();
     yards.push({id:uid(),name,loc:gv('new-yard-loc'),created:new Date().toISOString()});
     DB.setYards(yards);this.closeModal('m-add-yard');this.renderYards();this.populateSelects();
   },
- 
+
   openEditYard(yardId){
     const yard=DB.yards().find(y=>y.id===yardId);if(!yard)return;
     editingYardId=yardId;
@@ -782,7 +782,7 @@ const UI={
     el('edit-yard-loc').value=yard.loc||'';
     this.openModal('m-edit-yard');setTimeout(()=>el('edit-yard-name').focus(),80);
   },
- 
+
   saveEditYard(){
     const name=gv('edit-yard-name');if(!name){alert('Please enter a yard name.');return;}
     const yards=DB.yards();
@@ -791,7 +791,7 @@ const UI={
     DB.setYards(yards);this.closeModal('m-edit-yard');editingYardId=null;
     this.renderYards();this.populateSelects();
   },
- 
+
   deleteYard(){
     if(!editingYardId)return;
     const yards=DB.yards();
@@ -808,14 +808,14 @@ const UI={
     this.closeModal('m-edit-yard');editingYardId=null;
     this.renderYards();this.renderHives();this.populateSelects();
   },
- 
+
   populateYardSelect(selectId, selectedId){
     const yards=DB.yards();
     const opts='<option value="">No yard assigned</option>'+
       yards.map(y=>`<option value="${y.id}"${y.id===selectedId?' selected':''}>${y.name}</option>`).join('');
     const e=el(selectId);if(e)e.innerHTML=opts;
   },
- 
+
   // ── Splits ────────────────────────────────────────────────────────────────
   renderSplits(){
     const splits=DB.splits().sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -845,7 +845,7 @@ const UI={
       </div>`;
     }).join('');
   },
- 
+
   openAddSplit(){
     const today=new Date().toISOString().split('T')[0];
     el('split-date').value=today;
@@ -864,7 +864,7 @@ const UI={
     this.openModal('m-add-split');
     setTimeout(()=>el('split-daughter-name').focus(),80);
   },
- 
+
   populateSplitHiveSelects(){
     const hives=DB.hives(),yards=DB.yards();
     const hiveOpts='<option value="">Select colony…</option>'+hives.map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
@@ -872,7 +872,7 @@ const UI={
     const yardOpts='<option value="">No yard assigned</option>'+yards.map(y=>`<option value="${y.id}">${y.name}</option>`).join('');
     const yardSel=el('split-daughter-yard');if(yardSel)yardSel.innerHTML=yardOpts;
   },
- 
+
   saveSplit(){
     const date=gv('split-date');
     if(!date){alert('Please select a date.');return;}
@@ -880,7 +880,7 @@ const UI={
     if(!parentId){alert('Please select a parent colony.');return;}
     const queenSource=pillVal('pg-qsource');
     if(!queenSource){alert('Please select a queen source.');return;}
- 
+
     // Determine daughter hive — create new or use existing
     const mode=pillVal('pg-daughter-mode');
     let daughterId;
@@ -896,7 +896,7 @@ const UI={
       daughterId=newHive.id;
       this.populateSelects();
     }
- 
+
     const rec={
       id:uid(),date,
       parentHiveId:parentId,
@@ -913,7 +913,7 @@ const UI={
     this.renderSplits();
     this.renderHives();
   },
- 
+
   openSplitDetail(splitId){
     const splits=DB.splits(),hives=DB.hives();
     const s=splits.find(x=>x.id===splitId);if(!s)return;
@@ -940,7 +940,7 @@ const UI={
       </div>`;
     this.openModal('m-split-detail');
   },
- 
+
   deleteSplit(){
     if(!detailId||detailType!=='split')return;
     if(!confirm('Delete this split record?'))return;
@@ -949,13 +949,13 @@ const UI={
     this.closeModal('m-split-detail');
     this.renderSplits();
   },
- 
+
   // ── Lineage tree ──────────────────────────────────────────────────────────
   openLineage(hiveId){
     const hives=DB.hives(),splits=DB.splits();
     const hive=hives.find(h=>h.id===hiveId);if(!hive)return;
     el('m-lineage-t').textContent=`${hive.name} — Queen Lineage`;
- 
+
     // Build ancestor chain (walk up through queen source)
     const ancestors=[];
     let current=hiveId;
@@ -970,7 +970,7 @@ const UI={
       ancestors.push({split:originSplit,hiveId:srcId});
       current=srcId;
     }
- 
+
     // Build descendant tree (colonies whose queens trace back to this hive)
     const findDescendants=(hId,depth=0)=>{
       if(depth>10)return[];
@@ -985,7 +985,7 @@ const UI={
       return results;
     };
     const descendants=findDescendants(hiveId);
- 
+
     // Render
     const renderDesc=(nodes,depth=0)=>nodes.map(n=>`
       <div style="margin-left:${depth*16}px">
@@ -998,7 +998,7 @@ const UI={
         </div>
         ${n.children.length?renderDesc(n.children,0):''}
       </div>`).join('');
- 
+
     let html='';
     // Ancestors (top to bottom = oldest to most recent)
     [...ancestors].reverse().forEach((a,i)=>{
@@ -1012,25 +1012,25 @@ const UI={
       </div>
       <div class="lineage-connector"></div>`;
     });
- 
+
     // Current hive
     html+=`<div class="lineage-node current">
       <div class="lineage-label">This colony</div>
       <div class="lineage-name">${hive.name}</div>
       ${ancestors.length?`<div class="lineage-detail">Queen from: ${(()=>{const s=ancestors[0]?.split;const src=hives.find(h=>h.id===s?.queenSourceHiveId)||hives.find(h=>h.id===s?.parentHiveId);return src?src.name+' ('+fmtDate(s.date)+')':'unknown';})()}</div>`:'<div class="lineage-detail">No recorded queen lineage</div>'}
     </div>`;
- 
+
     // Descendants
     if(descendants.length){
       html+=renderDesc(descendants);
     } else if(!ancestors.length){
       html+=`<div style="font-size:13px;color:var(--muted);text-align:center;margin-top:12px">No splits recorded from this colony yet.</div>`;
     }
- 
+
     el('m-lineage-body').innerHTML=html;
     this.openModal('m-lineage');
   },
- 
+
   openHiveDetail(hiveId){
     const hives=DB.hives(),insps=DB.insps(),yards=DB.yards(),splits=DB.splits();
     const hive=hives.find(h=>h.id===hiveId);if(!hive)return;
@@ -1061,7 +1061,7 @@ const UI={
       ${hi.length>3?`<p style="font-size:13px;color:var(--muted);text-align:center;margin-top:6px">+${hi.length-3} more in History</p>`:''}`;
     this.openModal('m-detail');
   },
- 
+
   renderLogHives(){
     const hives=DB.hives(),yards=DB.yards();
     const list=el('log-hives');
@@ -1075,9 +1075,9 @@ const UI={
     }).join('');
     if(activeHive)this.renderForm();
   },
- 
+
   selectHive(id){stagedPhotos=[];activeHive=id;this.renderLogHives();},
- 
+
   renderForm(){
     const today=new Date().toISOString().split('T')[0];
     el('log-form').innerHTML=`<hr class="div"><div class="slbl">Inspection details</div>
@@ -1095,7 +1095,7 @@ const UI={
 ${Photos.formCard()}
 <button class="btn btn-p" style="margin-top:4px" onclick="UI.saveInsp()">Save inspection</button><div style="height:20px"></div>`;
   },
- 
+
   saveInsp(){
     const date=gv('f-date');if(!date){alert('Please select a date.');return;}
     const mites=el('f-mites')?el('f-mites').value.trim():'';
@@ -1111,7 +1111,7 @@ ${Photos.formCard()}
     el('log-form').innerHTML=`<div style="text-align:center;padding:40px 0;color:var(--text)"><div style="font-size:40px">✓</div><p style="font-weight:500;margin-top:10px">Inspection saved!</p></div>`;
     this.renderLogHives();setTimeout(()=>{el('log-form').innerHTML='';this.renderLogHives();},2000);
   },
- 
+
   renderHistory(){
     const hives=DB.hives(),yards=DB.yards();
     const filterHive=el('hist-filter').value;
@@ -1126,7 +1126,7 @@ ${Photos.formCard()}
     if(!insps.length){list.innerHTML='<div class="empty"><div class="empty-i">📋</div><p>No inspections yet.</p></div>';return;}
     list.innerHTML=insps.map(i=>this.inspCard(i,hives,true)).join('');
   },
- 
+
   inspCard(i,hives,clickable){
     const hive=hives.find(h=>h.id===i.hiveId);
     const photoCount=PhotoDB.count(i.id);
@@ -1148,7 +1148,7 @@ ${Photos.formCard()}
     const click=clickable?`onclick="UI.openInspDetail('${i.id}')"` :'';
     return`<div class="iitem" ${click}><div class="iitem-hdr"><div class="iitem-hive">${hive?hive.name:'Unknown'}</div><div class="iitem-date">${fmtDate(i.date)}</div></div>${i.notes?`<div class="iitem-note">${i.notes}</div>`:''}<div class="tags">${tags.map(t=>`<span class="tag ${t.c}">${t.l}</span>`).join('')}</div></div>`;
   },
- 
+
   openInspDetail(id){
     const insps=DB.insps(),hives=DB.hives();
     const i=insps.find(x=>x.id===id);if(!i)return;
@@ -1160,7 +1160,7 @@ ${Photos.formCard()}
     el('m-detail-body').innerHTML=`<table class="dtbl">${rows.map(([k,v])=>`<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`).join('')}</table>${Photos.renderDetailPhotos(id)}`;
     this.openModal('m-detail');
   },
- 
+
   deleteItem(){
     if(!detailId)return;
     if(detailType==='split'){
@@ -1179,9 +1179,9 @@ ${Photos.formCard()}
     }
     detailId=null;detailType=null;
   },
- 
+
   showExport(){this.populateSelects();this.openModal('m-export');},
- 
+
   doExport(){
     const hives=DB.hives(),filter=el('exp-filter').value;
     let insps=DB.insps().sort((a,b)=>new Date(a.date)-new Date(b.date));
@@ -1195,7 +1195,7 @@ ${Photos.formCard()}
     a.download='belles-honey-inspections.csv';a.click();
     this.closeModal('m-export');
   },
- 
+
   openModal(id){el(id).classList.add('on');},
   closeModal(id){el(id).classList.remove('on');},
   populateSelects(){
@@ -1208,9 +1208,29 @@ ${Photos.formCard()}
     ['exp-filter'].forEach(id=>{const e=el(id);if(e)e.innerHTML=expOpts;});
   },
 };
- 
+
 UI.renderHives();
 UI.populateSelects();
+
+// ── Service Worker registration (offline support) ─────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').then(reg=>{
+    reg.addEventListener('updatefound',()=>{
+      const newWorker=reg.installing;
+      newWorker.addEventListener('statechange',()=>{
+        if(newWorker.state==='installed'&&navigator.serviceWorker.controller){
+          // New version available — show subtle notice
+          const banner=document.createElement('div');
+          banner.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--amber);color:#1A1510;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;box-shadow:0 2px 12px rgba(0,0,0,.3)';
+          banner.textContent='Update available — tap to reload';
+          banner.onclick=()=>window.location.reload();
+          document.body.appendChild(banner);
+          setTimeout(()=>banner.remove(),8000);
+        }
+      });
+    });
+  }).catch(()=>{});
+}
 </script>
 </body>
 </html>
