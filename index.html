@@ -276,7 +276,15 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
   <div class="modal">
     <div class="modal-hdr"><span class="modal-t">Add yard</span><button class="modal-x" onclick="UI.closeModal('m-add-yard')">×</button></div>
     <div class="fg"><label>Yard name</label><input type="text" id="new-yard-name" placeholder="e.g. Back Yard, South Yard, Orchard"></div>
-    <div class="fg"><label>Location / notes</label><input type="text" id="new-yard-loc" placeholder="e.g. 48 hives, behind barn"></div>
+    <div class="fg"><label>Location / notes</label><input type="text" id="new-yard-loc" placeholder="e.g. behind barn, 48 hives"></div>
+    <div class="fg">
+      <label>GPS coordinates</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="new-yard-gps" placeholder="Tap to capture location" readonly style="flex:1;background:var(--surf2);cursor:default">
+        <button class="btn btn-sm" style="width:auto;flex-shrink:0;white-space:nowrap" onclick="UI.captureGPS('new-yard-gps','new-yard-gps-status')">📍 Capture</button>
+      </div>
+      <div id="new-yard-gps-status" style="font-size:12px;color:var(--muted);margin-top:4px"></div>
+    </div>
     <div class="btn-row">
       <button class="btn" onclick="UI.closeModal('m-add-yard')">Cancel</button>
       <button class="btn btn-p" onclick="UI.saveYard()">Add yard</button>
@@ -289,8 +297,16 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
   <div class="modal">
     <div class="modal-hdr"><span class="modal-t">Edit yard</span><button class="modal-x" onclick="UI.closeModal('m-edit-yard')">×</button></div>
     <div class="fg"><label>Yard name</label><input type="text" id="edit-yard-name" placeholder="e.g. Back Yard"></div>
-    <div class="fg"><label>Location / notes</label><input type="text" id="edit-yard-loc" placeholder="e.g. 48 hives, behind barn"></div>
-    <div class="btn-row">
+    <div class="fg"><label>Location / notes</label><input type="text" id="edit-yard-loc" placeholder="e.g. behind barn, 48 hives"></div>
+    <div class="fg">
+      <label>GPS coordinates</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="edit-yard-gps" placeholder="No location saved" readonly style="flex:1;background:var(--surf2);cursor:default">
+        <button class="btn btn-sm" style="width:auto;flex-shrink:0;white-space:nowrap" onclick="UI.captureGPS('edit-yard-gps','edit-yard-gps-status')">📍 Capture</button>
+      </div>
+      <div id="edit-yard-gps-status" style="font-size:12px;color:var(--muted);margin-top:4px"></div>
+    </div>
+    <div class="btn-row" style="flex-wrap:wrap;gap:8px">
       <button class="btn btn-d btn-sm" onclick="UI.deleteYard()">Delete yard</button>
       <button class="btn btn-p" onclick="UI.saveEditYard()" style="flex:2">Save changes</button>
     </div>
@@ -753,25 +769,39 @@ const UI={
     }
     list.innerHTML=yards.map(y=>{
       const count=hives.filter(h=>h.yardId===y.id).length;
-      return`<div class="hcard">
-        <div style="flex:1" onclick="UI.openEditYard('${y.id}')">
-          <div class="hcard-name">${y.name}</div>
-          <div class="hcard-meta">${y.loc||''} · ${count} hive${count!==1?'s':''}</div>
+      const hasGPS=y.lat&&y.lng;
+      const gpsStr=hasGPS?`${y.lat.toFixed(5)}, ${y.lng.toFixed(5)}`:'No GPS saved';
+      return`<div class="hcard" style="flex-direction:column;align-items:stretch;gap:0">
+        <div style="display:flex;align-items:center">
+          <div style="flex:1" onclick="UI.openEditYard('${y.id}')">
+            <div class="hcard-name">${y.name}</div>
+            <div class="hcard-meta">${y.loc||''} · ${count} hive${count!==1?'s':''}</div>
+          </div>
+          <button class="edit-btn" onclick="UI.openEditYard('${y.id}')" title="Edit yard">✎</button>
         </div>
-        <button class="edit-btn" onclick="UI.openEditYard('${y.id}')" title="Edit yard">✎</button>
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+          <span style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;flex:1">${hasGPS?'📍 '+gpsStr:'📍 No GPS saved'}</span>
+          ${hasGPS
+            ?`<button class="btn btn-sm btn-s" style="margin:0;white-space:nowrap" onclick="UI.openDirections('${y.id}')">🗺 Directions</button>`
+            :`<button class="btn btn-sm" style="margin:0;white-space:nowrap" onclick="UI.openEditYard('${y.id}')">Add GPS</button>`
+          }
+        </div>
       </div>`;
     }).join('');
   },
 
   openAddYard(){
     el('new-yard-name').value='';el('new-yard-loc').value='';
+    el('new-yard-gps').value='';el('new-yard-gps-status').textContent='';
     this.openModal('m-add-yard');setTimeout(()=>el('new-yard-name').focus(),80);
   },
 
   saveYard(){
     const name=gv('new-yard-name');if(!name){alert('Please enter a yard name.');return;}
     const yards=DB.yards();
-    yards.push({id:uid(),name,loc:gv('new-yard-loc'),created:new Date().toISOString()});
+    const gpsVal=el('new-yard-gps').value;
+    const [lat,lng]=UI._parseGPS(gpsVal);
+    yards.push({id:uid(),name,loc:gv('new-yard-loc'),lat,lng,created:new Date().toISOString()});
     DB.setYards(yards);this.closeModal('m-add-yard');this.renderYards();this.populateSelects();
   },
 
@@ -780,6 +810,8 @@ const UI={
     editingYardId=yardId;
     el('edit-yard-name').value=yard.name||'';
     el('edit-yard-loc').value=yard.loc||'';
+    el('edit-yard-gps').value=(yard.lat&&yard.lng)?`${yard.lat}, ${yard.lng}`:'';
+    el('edit-yard-gps-status').textContent='';
     this.openModal('m-edit-yard');setTimeout(()=>el('edit-yard-name').focus(),80);
   },
 
@@ -788,8 +820,54 @@ const UI={
     const yards=DB.yards();
     const y=yards.find(y=>y.id===editingYardId);if(!y)return;
     y.name=name;y.loc=gv('edit-yard-loc');
+    const gpsVal=el('edit-yard-gps').value;
+    const [lat,lng]=UI._parseGPS(gpsVal);
+    y.lat=lat;y.lng=lng;
     DB.setYards(yards);this.closeModal('m-edit-yard');editingYardId=null;
     this.renderYards();this.populateSelects();
+  },
+
+  // ── GPS helpers ────────────────────────────────────────────────────────────
+  _parseGPS(str){
+    if(!str||!str.trim())return[null,null];
+    const parts=str.split(',').map(s=>parseFloat(s.trim()));
+    if(parts.length===2&&!isNaN(parts[0])&&!isNaN(parts[1]))return[parts[0],parts[1]];
+    return[null,null];
+  },
+
+  captureGPS(inputId, statusId){
+    const statusEl=el(statusId);
+    if(!navigator.geolocation){
+      statusEl.textContent='GPS not available on this device.';
+      statusEl.style.color='var(--red)';
+      return;
+    }
+    statusEl.textContent='Getting location…';
+    statusEl.style.color='var(--muted)';
+    navigator.geolocation.getCurrentPosition(
+      pos=>{
+        const lat=pos.coords.latitude.toFixed(6);
+        const lng=pos.coords.longitude.toFixed(6);
+        el(inputId).value=`${lat}, ${lng}`;
+        const acc=Math.round(pos.coords.accuracy);
+        statusEl.textContent=`✓ Captured — accuracy ±${acc}m`;
+        statusEl.style.color='var(--green)';
+      },
+      err=>{
+        const msgs={1:'Location permission denied — check browser settings.',2:'Location unavailable.',3:'Location request timed out.'};
+        statusEl.textContent=msgs[err.code]||'Could not get location.';
+        statusEl.style.color='var(--red)';
+      },
+      {enableHighAccuracy:true,timeout:12000,maximumAge:0}
+    );
+  },
+
+  openDirections(yardId){
+    const yard=DB.yards().find(y=>y.id===yardId);
+    if(!yard||!yard.lat||!yard.lng)return;
+    // Opens Google Maps navigation — works on both Android and iOS
+    const url=`https://www.google.com/maps/dir/?api=1&destination=${yard.lat},${yard.lng}&travelmode=driving`;
+    window.open(url,'_blank');
   },
 
   deleteYard(){
