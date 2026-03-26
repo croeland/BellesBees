@@ -1,11 +1,9 @@
 // Belle's Honey — Service Worker
-// Caches the app shell for full offline use.
-// Update CACHE_VERSION any time you deploy a new version of index.html.
+// Bump CACHE_VERSION any time you deploy a new version of index.html.
 
-const CACHE_VERSION = 'bh-v1';
+const CACHE_VERSION = 'bh-v2';
 const CACHE_NAME = `belles-honey-${CACHE_VERSION}`;
 
-// Files to cache on install
 const PRECACHE = [
   './',
   './index.html',
@@ -16,7 +14,6 @@ const PRECACHE = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      // Cache core files — ignore font failures (they'll work when online)
       return Promise.allSettled(
         PRECACHE.map(url => cache.add(url).catch(() => {}))
       );
@@ -41,12 +38,10 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Always use cache for the app itself
   if (url.origin === self.location.origin) {
     event.respondWith(
       caches.match(event.request).then(cached => {
         if (cached) return cached;
-        // Not in cache yet — fetch and store
         return fetch(event.request).then(response => {
           if (response && response.status === 200) {
             const clone = response.clone();
@@ -59,7 +54,6 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // For Google Fonts — try network, fall back to cache
   if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
     event.respondWith(
       fetch(event.request).then(response => {
@@ -71,6 +65,5 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Everything else — network only
   event.respondWith(fetch(event.request).catch(() => {}));
 });
