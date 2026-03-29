@@ -255,6 +255,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
   <div class="modal">
     <div class="modal-hdr"><span class="modal-t">Add hive</span><button class="modal-x" onclick="UI.closeModal('m-add')">×</button></div>
     <div class="fg"><label>Hive name / number</label><input type="text" id="new-name" placeholder="e.g. Hive 3, South Yard #1"></div>
+    <div class="fg"><label>Colony type</label><select id="new-type"><option value="">Select type…</option><option value="2-frame mating nuc">2-frame mating nuc</option><option value="5-frame nuc">5-frame nuc</option><option value="10-frame standard">10-frame standard</option></select></div>
     <div class="fg"><label>Yard</label><select id="new-yard"><option value="">No yard assigned</option></select></div>
     <div class="fg"><label>Location / notes</label><input type="text" id="new-loc" placeholder="e.g. Back orchard, Langstroth 10-frame"></div>
     <div class="btn-row">
@@ -269,6 +270,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
   <div class="modal">
     <div class="modal-hdr"><span class="modal-t">Edit hive</span><button class="modal-x" onclick="UI.closeModal('m-edit-hive')">×</button></div>
     <div class="fg"><label>Hive name / number</label><input type="text" id="edit-hive-name" placeholder="e.g. Hive 3"></div>
+    <div class="fg"><label>Colony type</label><select id="edit-hive-type"><option value="">Select type…</option><option value="2-frame mating nuc">2-frame mating nuc</option><option value="5-frame nuc">5-frame nuc</option><option value="10-frame standard">10-frame standard</option></select></div>
     <div class="fg"><label>Yard</label><select id="edit-hive-yard"><option value="">No yard assigned</option></select></div>
     <div class="fg"><label>Location / notes</label><input type="text" id="edit-hive-loc" placeholder="e.g. Back orchard, Langstroth 10-frame"></div>
     <div class="btn-row">
@@ -340,6 +342,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:4px 0 16px}
       </div>
       <div id="daughter-new">
         <input type="text" id="split-daughter-name" placeholder="New colony name / number (e.g. Hive 12)" style="margin-bottom:8px">
+        <select id="split-daughter-type" style="margin-bottom:8px"><option value="">Colony type…</option><option value="2-frame mating nuc">2-frame mating nuc</option><option value="5-frame nuc">5-frame nuc</option><option value="10-frame standard">10-frame standard</option></select>
         <select id="split-daughter-yard"><option value="">No yard assigned</option></select>
         <input type="text" id="split-daughter-loc" placeholder="Location / notes (optional)" style="margin-top:8px">
       </div>
@@ -731,9 +734,13 @@ const UI={
       const st=hiveStatus(h.id,insps);
       const li=lastInsp(h.id,insps);
       const yard=yards.find(y=>y.id===h.yardId);
+      const typeBadge=h.colonyType?`<span style="font-size:10px;padding:2px 7px;border-radius:8px;background:var(--blue-l);color:var(--blue);font-family:'IBM Plex Mono',monospace;margin-left:6px">${h.colonyType}</span>`:'';
       const meta=[yard?yard.name:h.loc||'',li?'Last: '+fmtDate(li.date):'Never inspected'].filter(Boolean).join(' · ');
       return`<div class="hcard" onclick="UI.openHiveDetail('${h.id}')">
-        <div style="flex:1"><div class="hcard-name">${h.name}</div><div class="hcard-meta">${meta}</div></div>
+        <div style="flex:1">
+          <div class="hcard-name">${h.name}${typeBadge}</div>
+          <div class="hcard-meta">${meta}</div>
+        </div>
         <button class="edit-btn" onclick="event.stopPropagation();UI.openEditHive('${h.id}')" title="Edit hive">✎</button>
         <div class="dot dot-${st}" style="margin-left:8px"></div>
       </div>`;
@@ -742,6 +749,7 @@ const UI={
 
   openAddHive(){
     el('new-name').value='';el('new-loc').value='';
+    el('new-type').value='';
     this.populateYardSelect('new-yard','');
     this.openModal('m-add');setTimeout(()=>el('new-name').focus(),80);
   },
@@ -749,7 +757,7 @@ const UI={
   saveHive(){
     const name=gv('new-name');if(!name){alert('Please enter a hive name.');return;}
     const hives=DB.hives();
-    hives.push({id:uid(),name,yardId:el('new-yard').value,loc:gv('new-loc'),created:new Date().toISOString()});
+    hives.push({id:uid(),name,colonyType:el('new-type').value,yardId:el('new-yard').value,loc:gv('new-loc'),created:new Date().toISOString()});
     DB.setHives(hives);this.closeModal('m-add');this.renderHives();this.populateSelects();
   },
 
@@ -757,6 +765,7 @@ const UI={
     const hive=DB.hives().find(h=>h.id===hiveId);if(!hive)return;
     editingHiveId=hiveId;
     el('edit-hive-name').value=hive.name||'';
+    el('edit-hive-type').value=hive.colonyType||'';
     el('edit-hive-loc').value=hive.loc||'';
     this.populateYardSelect('edit-hive-yard',hive.yardId||'');
     this.openModal('m-edit-hive');
@@ -767,7 +776,7 @@ const UI={
     const name=gv('edit-hive-name');if(!name){alert('Please enter a hive name.');return;}
     const hives=DB.hives();
     const h=hives.find(h=>h.id===editingHiveId);if(!h)return;
-    h.name=name;h.yardId=el('edit-hive-yard').value;h.loc=gv('edit-hive-loc');
+    h.name=name;h.colonyType=el('edit-hive-type').value;h.yardId=el('edit-hive-yard').value;h.loc=gv('edit-hive-loc');
     DB.setHives(hives);this.closeModal('m-edit-hive');editingHiveId=null;
     this.renderHives();this.populateSelects();
   },
@@ -953,6 +962,7 @@ const UI={
     el('daughter-new').style.display='block';
     el('daughter-existing').style.display='none';
     el('split-daughter-name').value='';
+    el('split-daughter-type').value='';
     el('split-daughter-loc').value='';
     el('split-notes').value='';
     el('split-source-detail').style.display='none';
@@ -987,7 +997,7 @@ const UI={
     } else {
       const name=gv('split-daughter-name');
       if(!name){alert('Please enter a name for the new colony.');return;}
-      const newHive={id:uid(),name,yardId:el('split-daughter-yard').value,loc:gv('split-daughter-loc'),created:new Date().toISOString()};
+      const newHive={id:uid(),name,colonyType:el('split-daughter-type').value,yardId:el('split-daughter-yard').value,loc:gv('split-daughter-loc'),created:new Date().toISOString()};
       const hives=DB.hives();hives.push(newHive);DB.setHives(hives);
       daughterId=newHive.id;
       this.populateSelects();
@@ -1145,6 +1155,7 @@ const UI={
     const descendants=splits.filter(s=>s.parentHiveId===hiveId||s.queenSourceHiveId===hiveId);
     el('m-detail-body').innerHTML=`
       <div class="fg"><label>Yard</label><div style="color:var(--text)">${yard?yard.name:'—'}</div></div>
+      <div class="fg"><label>Colony type</label><div style="color:var(--text)">${hive.colonyType||'—'}</div></div>
       <div class="fg"><label>Location</label><div style="color:var(--text)">${hive.loc||'—'}</div></div>
       <div class="fg"><label>Queen origin</label><div style="color:var(--text);font-size:13px">${lineageStr}</div></div>
       <div class="fg"><label>Descendants</label><div style="color:var(--text)">${descendants.length} split${descendants.length!==1?'s':''} recorded from this colony</div></div>
