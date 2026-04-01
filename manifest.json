@@ -1,0 +1,27 @@
+{
+  "name": "Belle's Honey",
+  "short_name": "Belle's Honey",
+  "description": "Hive inspection log and management app for Belle's Honey",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#FFFDF7",
+  "theme_color": "#BA7517",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
