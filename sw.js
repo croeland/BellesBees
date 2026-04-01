@@ -1,7 +1,7 @@
 // Belle's Honey — Service Worker
 // Bump CACHE_VERSION any time you deploy a new version of index.html.
 
-const CACHE_VERSION = 'bh-v4';
+const CACHE_VERSION = 'bh-v6';
 const CACHE_NAME = `belles-honey-${CACHE_VERSION}`;
 
 const PRECACHE = [
